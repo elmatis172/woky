@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { parseImages } from "@/lib/json-helpers";
+import { ProductActions } from "@/components/admin/product-actions";
 
 export default async function ProductsAdminPage() {
   const products = await db.product.findMany({
@@ -114,16 +115,11 @@ export default async function ProductsAdminPage() {
                         {product.status === "PUBLISHED" ? "Publicado" : "Borrador"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                      <Link
-                        href={`/admin/productos/${product.id}/editar`}
-                        className="inline-flex items-center text-blue-600 hover:text-blue-700"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      <button className="inline-flex items-center text-red-600 hover:text-red-700">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                      <ProductActions 
+                        productId={product.id} 
+                        productName={product.name}
+                      />
                     </td>
                   </tr>
                 );
