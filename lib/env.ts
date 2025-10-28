@@ -11,7 +11,7 @@ export const env = createEnv({
     NEXTAUTH_URL: z.string().url().optional(),
     EMAIL_SERVER: z.string().optional(),
     EMAIL_FROM: z.string().email().optional(),
-    MP_ACCESS_TOKEN: z.string().min(1),
+    MP_ACCESS_TOKEN: z.string().min(1).optional(),
     UPLOADTHING_SECRET: z.string().optional(),
     UPLOADTHING_APP_ID: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().url().or(z.literal("")).optional(),
