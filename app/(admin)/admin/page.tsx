@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
                     #{order.id.slice(0, 8)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {order.user.name}
+                    {order.user?.name || "Usuario eliminado"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
                     ${order.total.toLocaleString("es-AR")}

@@ -86,10 +86,10 @@ export default async function OrdersAdminPage() {
                   <td className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {order.user.name}
+                        {order.user?.name || "Usuario eliminado"}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {order.user.email}
+                        {order.user?.email || "N/A"}
                       </p>
                     </div>
                   </td>
