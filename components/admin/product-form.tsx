@@ -492,19 +492,35 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         </div>
       </div>
 
-      {/* Botones de Acción */}
-      <div className="flex justify-end gap-4">
-        <button
-          type="button"
-          onClick={() => router.push("/admin/productos")}
-          disabled={loading}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800 disabled:opacity-50"
-        >
-          Cancelar
-        </button>
-        <Button type="submit" disabled={loading}>
-          {loading ? "Guardando..." : isEdit ? "Actualizar Producto" : "Crear Producto"}
-        </Button>
+      {/* Botones de Acción - Sticky al fondo */}
+      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 pt-6 pb-6 -mx-6 px-6 -mb-6 mt-6 z-10">
+        <div className="flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/productos")}
+            disabled={loading}
+            className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800 disabled:opacity-50 font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+          >
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Guardando...
+              </span>
+            ) : (
+              isEdit ? "💾 Actualizar Producto" : "✨ Crear Producto"
+            )}
+          </button>
+        </div>
       </div>
     </form>
   );

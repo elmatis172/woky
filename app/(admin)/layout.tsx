@@ -80,7 +80,7 @@ export default async function AdminLayout({
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        <div className="p-8">{children}</div>
+        <div className="p-8 pb-24 min-h-screen">{children}</div>
       </main>
     </div>
   );
