@@ -4,6 +4,33 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, Package, User, CreditCard, MapPin } from "lucide-react";
 
+// Funciones helper fuera del componente
+function formatPrice(amount: number): string {
+  try {
+    return new Intl.NumberFormat('es-AR').format(amount);
+  } catch {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+}
+
+function formatDate(date: Date | string): string {
+  try {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0] + ' ' + d.toTimeString().split(' ')[0];
+  } catch {
+    return String(date);
+  }
+}
+
+function parseShippingAddress(address: string | null): any {
+  if (!address) return null;
+  try {
+    return typeof address === 'string' ? JSON.parse(address) : address;
+  } catch {
+    return address;
+  }
+}
+
 interface OrderDetailPageProps {
   params: Promise<{
     id: string;
@@ -35,41 +62,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     notFound();
   }
 
-  // Función helper para formatear precios
-  const formatPrice = (amount: number) => {
-    try {
-      return amount.toLocaleString("es-AR");
-    } catch {
-      return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-  };
-
-  // Función helper para formatear fecha
-  const formatDate = (date: Date) => {
-    try {
-      return new Date(date).toLocaleDateString("es-AR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return new Date(date).toISOString().split('T')[0];
-    }
-  };
-
-  // Parsear dirección de envío si existe
-  let shippingAddress = null;
-  if (order.shippingAddress) {
-    try {
-      shippingAddress = typeof order.shippingAddress === 'string' 
-        ? JSON.parse(order.shippingAddress) 
-        : order.shippingAddress;
-    } catch {
-      shippingAddress = order.shippingAddress;
-    }
-  }
+  // Parse shipping address usando la función helper
+  const shippingAddress = parseShippingAddress(order.shippingAddress);
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
