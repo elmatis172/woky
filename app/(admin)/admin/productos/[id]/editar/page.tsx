@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { ProductForm } from "@/components/admin/product-form";
 
 interface EditProductPageProps {
   params: Promise<{
@@ -28,6 +29,61 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     redirect("/admin/productos");
   }
 
+  // Obtener todas las categorías
+  const categories = await db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  // Parsear imágenes
+  let images: string[] = [];
+  try {
+    images = typeof product.images === "string" 
+      ? JSON.parse(product.images) 
+      : Array.isArray(product.images) 
+      ? product.images 
+      : [];
+  } catch (e) {
+    images = [];
+  }
+
+  // Parsear tags
+  let tags: string[] = [];
+  try {
+    tags = typeof product.tags === "string" 
+      ? JSON.parse(product.tags) 
+      : Array.isArray(product.tags) 
+      ? product.tags 
+      : [];
+  } catch (e) {
+    tags = [];
+  }
+
+  const handleSubmit = async (data: any) => {
+    "use server";
+    
+    await db.product.update({
+      where: { id },
+      data: {
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+        price: Number(data.price),
+        compareAtPrice: data.compareAtPrice ? Number(data.compareAtPrice) : null,
+        sku: data.sku,
+        stock: Number(data.stock),
+        images: JSON.stringify(data.images || []),
+        categoryId: data.categoryId || null,
+        status: data.status,
+        featured: data.featured,
+        tags: JSON.stringify(data.tags || []),
+        seoTitle: data.seoTitle || null,
+        seoDescription: data.seoDescription || null,
+      },
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -39,41 +95,16 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-semibold text-lg">Información del Producto</h3>
-            <dl className="mt-4 space-y-2">
-              <div className="flex justify-between">
-                <dt className="text-gray-600 dark:text-gray-400">Nombre:</dt>
-                <dd className="font-medium">{product.name}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600 dark:text-gray-400">Precio:</dt>
-                <dd className="font-medium">${product.price}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600 dark:text-gray-400">Stock:</dt>
-                <dd className="font-medium">{product.stock}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600 dark:text-gray-400">Categoría:</dt>
-                <dd className="font-medium">{product.category?.name || "Sin categoría"}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-600 dark:text-gray-400">Estado:</dt>
-                <dd className="font-medium">{product.status}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500">
-              Formulario de edición en desarrollo. Por ahora, podés ver la información del producto aquí.
-            </p>
-          </div>
-        </div>
-      </div>
+      <ProductForm
+        product={{
+          ...product,
+          images,
+          tags,
+        }}
+        categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
+        onSubmit={handleSubmit}
+        isEdit
+      />
     </div>
   );
 }
