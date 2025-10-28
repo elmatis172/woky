@@ -37,7 +37,7 @@ export default async function AdminDashboard() {
     },
   });
   
-  const totalRevenue = allOrders.reduce((sum, order) => sum + order.total, 0);
+  const totalRevenue = allOrders.reduce((sum: number, order: any) => sum + order.totalAmount, 0);
 
   const stats = [
     {
@@ -157,7 +157,7 @@ export default async function AdminDashboard() {
                     {order.user?.name || "Usuario eliminado"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
-                    ${order.total.toLocaleString("es-AR")}
+                    ${order.totalAmount.toLocaleString("es-AR")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

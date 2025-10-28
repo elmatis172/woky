@@ -101,7 +101,7 @@ export default async function OrdersAdminPage() {
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                    ${order.total.toLocaleString("es-AR")}
+                    ${order.totalAmount.toLocaleString("es-AR")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
