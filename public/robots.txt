@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://woky-store.com/sitemap.xml
