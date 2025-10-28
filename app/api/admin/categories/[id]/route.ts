@@ -37,6 +37,62 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    const { id } = await context.params;
+    const body = await request.json();
+    const { name, slug, description } = body;
+
+    const existingCategory = await db.category.findUnique({
+      where: { id },
+    });
+
+    if (!existingCategory) {
+      return NextResponse.json({ error: "Categoría no encontrada" }, { status: 404 });
+    }
+
+    // Verificar que el slug sea único (si cambió)
+    if (slug !== existingCategory.slug) {
+      const slugExists = await db.category.findUnique({
+        where: { slug },
+      });
+
+      if (slugExists) {
+        return NextResponse.json(
+          { error: "Ya existe una categoría con este slug" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const category = await db.category.update({
+      where: { id },
+      data: {
+        name,
+        slug,
+        description: description || null,
+      },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return NextResponse.json(
+      { error: "Error al actualizar la categoría" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }

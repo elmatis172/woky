@@ -60,30 +60,6 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     tags = [];
   }
 
-  const handleSubmit = async (data: any) => {
-    "use server";
-    
-    await db.product.update({
-      where: { id },
-      data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description,
-        price: Number(data.price),
-        compareAtPrice: data.compareAtPrice ? Number(data.compareAtPrice) : null,
-        sku: data.sku,
-        stock: Number(data.stock),
-        images: JSON.stringify(data.images || []),
-        categoryId: data.categoryId || null,
-        status: data.status,
-        featured: data.featured,
-        tags: JSON.stringify(data.tags || []),
-        seoTitle: data.seoTitle || null,
-        seoDescription: data.seoDescription || null,
-      },
-    });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -97,12 +73,12 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
       <ProductForm
         product={{
+          id,
           ...product,
           images,
           tags,
         }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
-        onSubmit={handleSubmit}
         isEdit
       />
     </div>

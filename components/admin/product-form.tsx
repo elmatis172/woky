@@ -25,13 +25,12 @@ interface ProductFormData {
 }
 
 interface ProductFormProps {
-  product?: Partial<ProductFormData>;
+  product?: Partial<ProductFormData> & { id?: string };
   categories: Array<{ id: string; name: string }>;
-  onSubmit: (data: ProductFormData) => Promise<void>;
   isEdit?: boolean;
 }
 
-export function ProductForm({ product, categories, onSubmit, isEdit = false }: ProductFormProps) {
+export function ProductForm({ product, categories, isEdit = false }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +60,23 @@ export function ProductForm({ product, categories, onSubmit, isEdit = false }: P
     setError(null);
 
     try {
-      await onSubmit(formData);
+      const url = isEdit && product?.id 
+        ? `/api/admin/products/${product.id}` 
+        : '/api/admin/products';
+      
+      const method = isEdit ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al guardar el producto');
+      }
+
       router.push("/admin/productos");
       router.refresh();
     } catch (err) {

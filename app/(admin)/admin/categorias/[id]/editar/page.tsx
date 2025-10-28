@@ -26,19 +26,6 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  const handleSubmit = async (data: any) => {
-    "use server";
-    
-    await db.category.update({
-      where: { id },
-      data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description || null,
-      },
-    });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -50,7 +37,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
         </p>
       </div>
 
-      <CategoryForm category={category} onSubmit={handleSubmit} isEdit />
+      <CategoryForm category={{ id, ...category }} isEdit />
     </div>
   );
 }

@@ -17,29 +17,6 @@ export default async function NewProductPage() {
     },
   });
 
-  const handleSubmit = async (data: any) => {
-    "use server";
-    
-    await db.product.create({
-      data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description,
-        price: Number(data.price),
-        compareAtPrice: data.compareAtPrice ? Number(data.compareAtPrice) : null,
-        sku: data.sku,
-        stock: Number(data.stock),
-        images: JSON.stringify(data.images || []),
-        categoryId: data.categoryId || null,
-        status: data.status || "DRAFT",
-        featured: data.featured || false,
-        tags: JSON.stringify(data.tags || []),
-        seoTitle: data.seoTitle || null,
-        seoDescription: data.seoDescription || null,
-      },
-    });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -53,7 +30,6 @@ export default async function NewProductPage() {
 
       <ProductForm
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
-        onSubmit={handleSubmit}
       />
     </div>
   );

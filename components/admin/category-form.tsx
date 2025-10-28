@@ -14,12 +14,11 @@ interface CategoryFormData {
 }
 
 interface CategoryFormProps {
-  category?: Partial<CategoryFormData>;
-  onSubmit: (data: CategoryFormData) => Promise<void>;
+  category?: Partial<CategoryFormData> & { id?: string };
   isEdit?: boolean;
 }
 
-export function CategoryForm({ category, onSubmit, isEdit = false }: CategoryFormProps) {
+export function CategoryForm({ category, isEdit = false }: CategoryFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +35,23 @@ export function CategoryForm({ category, onSubmit, isEdit = false }: CategoryFor
     setError(null);
 
     try {
-      await onSubmit(formData);
+      const url = isEdit && category?.id 
+        ? `/api/admin/categories/${category.id}` 
+        : '/api/admin/categories';
+      
+      const method = isEdit ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al guardar la categoría');
+      }
+
       router.push("/admin/categorias");
       router.refresh();
     } catch (err) {

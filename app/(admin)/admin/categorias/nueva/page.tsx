@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
 import { CategoryForm } from "@/components/admin/category-form";
 
 export default async function NewCategoryPage() {
@@ -9,18 +8,6 @@ export default async function NewCategoryPage() {
   if (!session || session.user.role !== "ADMIN") {
     redirect("/sign-in");
   }
-
-  const handleSubmit = async (data: any) => {
-    "use server";
-    
-    await db.category.create({
-      data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description || null,
-      },
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -33,7 +20,7 @@ export default async function NewCategoryPage() {
         </p>
       </div>
 
-      <CategoryForm onSubmit={handleSubmit} />
+      <CategoryForm />
     </div>
   );
 }
