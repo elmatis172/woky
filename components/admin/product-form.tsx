@@ -35,6 +35,20 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Parsear imágenes si vienen como string
+  const parseImages = (images: any): string[] => {
+    if (Array.isArray(images)) return images;
+    if (typeof images === "string") {
+      try {
+        const parsed = JSON.parse(images);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+  
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || "",
     slug: product?.slug || "",
@@ -43,7 +57,7 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     compareAtPrice: product?.compareAtPrice || null,
     sku: product?.sku || "",
     stock: product?.stock || 0,
-    images: product?.images || [],
+    images: parseImages(product?.images),
     categoryId: product?.categoryId || "",
     status: product?.status || "DRAFT",
     featured: product?.featured || false,
@@ -101,10 +115,18 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
   };
 
   const addImage = () => {
-    if (imageUrl && !formData.images.includes(imageUrl)) {
-      setFormData({ ...formData, images: [...formData.images, imageUrl] });
-      setImageUrl("");
+    if (!imageUrl.trim()) {
+      alert("Por favor ingresá una URL de imagen");
+      return;
     }
+    
+    if (formData.images.includes(imageUrl)) {
+      alert("Esta imagen ya fue agregada");
+      return;
+    }
+    
+    setFormData({ ...formData, images: [...formData.images, imageUrl.trim()] });
+    setImageUrl("");
   };
 
   const removeImage = (index: number) => {
@@ -262,11 +284,17 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="URL de la imagen (Unsplash, Imgur, etc.)"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addImage();
+                }
+              }}
             />
             <button
               type="button"
               onClick={addImage}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors whitespace-nowrap font-medium"
             >
               Agregar
             </button>
