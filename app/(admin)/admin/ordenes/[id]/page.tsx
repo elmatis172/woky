@@ -35,6 +35,18 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     notFound();
   }
 
+  // Parsear dirección de envío si existe
+  let shippingAddress = null;
+  if (order.shippingAddress) {
+    try {
+      shippingAddress = typeof order.shippingAddress === 'string' 
+        ? JSON.parse(order.shippingAddress) 
+        : order.shippingAddress;
+    } catch {
+      shippingAddress = order.shippingAddress;
+    }
+  }
+
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
     PAID: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
@@ -174,15 +186,39 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             </div>
           </div>
 
-          {order.shippingAddress && (
+          {shippingAddress && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
                 Dirección de Envío
               </h2>
-              <p className="text-sm text-gray-900 dark:text-white whitespace-pre-line">
-                {order.shippingAddress}
-              </p>
+              <div className="space-y-2 text-sm">
+                {typeof shippingAddress === 'string' ? (
+                  <p className="text-gray-900 dark:text-white whitespace-pre-line">
+                    {shippingAddress}
+                  </p>
+                ) : (
+                  <>
+                    {shippingAddress.street && (
+                      <p className="text-gray-900 dark:text-white">
+                        {shippingAddress.street}
+                      </p>
+                    )}
+                    {(shippingAddress.city || shippingAddress.state || shippingAddress.zipCode) && (
+                      <p className="text-gray-900 dark:text-white">
+                        {[shippingAddress.city, shippingAddress.state, shippingAddress.zipCode]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </p>
+                    )}
+                    {shippingAddress.country && (
+                      <p className="text-gray-900 dark:text-white">
+                        {shippingAddress.country}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
