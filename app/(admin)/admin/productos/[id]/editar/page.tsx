@@ -79,7 +79,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           tags,
         }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
-        isEdit
+        isEdit={true}
       />
     </div>
   );
