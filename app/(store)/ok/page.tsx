@@ -6,9 +6,9 @@ import Link from "next/link";
 export default async function OkPage({
   searchParams,
 }: {
-  searchParams: { order?: string };
+  searchParams: Promise<{ order?: string }>;
 }) {
-  const orderId = searchParams.order;
+  const { order: orderId } = await searchParams;
 
   if (!orderId) {
     redirect("/");
