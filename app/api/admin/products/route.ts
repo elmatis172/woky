@@ -57,9 +57,6 @@ export async function POST(request: NextRequest) {
       categoryId,
       status,
       featured,
-      tags,
-      seoTitle,
-      seoDescription,
     } = body;
 
     // Validaciones básicas
@@ -96,9 +93,6 @@ export async function POST(request: NextRequest) {
         categoryId: categoryId || null,
         status: status || "DRAFT",
         featured: featured || false,
-        tags: JSON.stringify(tags || []),
-        seoTitle: seoTitle || null,
-        seoDescription: seoDescription || null,
       },
       include: {
         category: true,

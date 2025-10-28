@@ -44,20 +44,8 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       : Array.isArray(product.images) 
       ? product.images 
       : [];
-  } catch (e) {
+  } catch {
     images = [];
-  }
-
-  // Parsear tags
-  let tags: string[] = [];
-  try {
-    tags = typeof product.tags === "string" 
-      ? JSON.parse(product.tags) 
-      : Array.isArray(product.tags) 
-      ? product.tags 
-      : [];
-  } catch (e) {
-    tags = [];
   }
 
   return (
@@ -74,9 +62,17 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       <ProductForm
         product={{
           id,
-          ...product,
+          name: product.name,
+          slug: product.slug,
+          description: product.description ?? undefined,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice ?? undefined,
+          sku: product.sku ?? undefined,
+          stock: product.stock,
+          status: product.status,
+          featured: product.featured,
+          categoryId: product.categoryId ?? undefined,
           images,
-          tags,
         }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
         isEdit={true}

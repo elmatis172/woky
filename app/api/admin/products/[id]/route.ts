@@ -58,9 +58,6 @@ export async function PUT(
       categoryId,
       status,
       featured,
-      tags,
-      seoTitle,
-      seoDescription,
     } = body;
 
     // Verificar que el producto existe
@@ -101,9 +98,6 @@ export async function PUT(
         categoryId: categoryId || null,
         status,
         featured,
-        tags: JSON.stringify(tags || []),
-        seoTitle: seoTitle || null,
-        seoDescription: seoDescription || null,
       },
       include: {
         category: true,

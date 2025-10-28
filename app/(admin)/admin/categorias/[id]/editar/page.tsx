@@ -37,7 +37,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
         </p>
       </div>
 
-      <CategoryForm category={{ id, ...category }} isEdit />
+      <CategoryForm category={{ ...category, id }} isEdit />
     </div>
   );
 }
