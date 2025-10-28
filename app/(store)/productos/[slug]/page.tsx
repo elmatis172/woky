@@ -7,14 +7,15 @@ import { ProductGallery } from "@/components/product-gallery";
 import { Badge } from "@/components/ui/badge";
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: ProductPageProps) {
+  const { slug } = await params;
   const product = await db.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
 
   if (!product) {
@@ -35,9 +36,10 @@ export async function generateMetadata({ params }: ProductPageProps) {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
+  const { slug } = await params;
   const product = await db.product.findUnique({
     where: {
-      slug: params.slug,
+      slug,
       status: "PUBLISHED",
     },
     include: {
