@@ -35,6 +35,30 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     notFound();
   }
 
+  // Función helper para formatear precios
+  const formatPrice = (amount: number) => {
+    try {
+      return amount.toLocaleString("es-AR");
+    } catch {
+      return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+  };
+
+  // Función helper para formatear fecha
+  const formatDate = (date: Date) => {
+    try {
+      return new Date(date).toLocaleDateString("es-AR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return new Date(date).toISOString().split('T')[0];
+    }
+  };
+
   // Parsear dirección de envío si existe
   let shippingAddress = null;
   if (order.shippingAddress) {
@@ -77,13 +101,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             Orden #{order.id.slice(0, 8)}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {new Date(order.createdAt).toLocaleDateString("es-AR", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {formatDate(order.createdAt)}
           </p>
         </div>
       </div>
@@ -107,7 +125,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${order.totalAmount.toLocaleString("es-AR")}
+                  ${formatPrice(order.totalAmount)}
                 </p>
               </div>
               {order.mpPaymentId && (
@@ -135,12 +153,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                       {item.product?.name || "Producto eliminado"}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Cantidad: {item.quantity} × ${item.price.toLocaleString("es-AR")}
+                      Cantidad: {item.quantity} × ${formatPrice(item.price)}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      ${(item.quantity * item.price).toLocaleString("es-AR")}
+                      ${formatPrice(item.quantity * item.price)}
                     </p>
                   </div>
                 </div>
@@ -148,7 +166,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <div className="flex justify-between items-center pt-4 border-t-2 border-gray-300 dark:border-gray-600">
                 <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${order.totalAmount.toLocaleString("es-AR")}
+                  ${formatPrice(order.totalAmount)}
                 </span>
               </div>
             </div>
