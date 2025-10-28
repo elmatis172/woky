@@ -62,8 +62,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     notFound();
   }
 
-  // Parse shipping address usando la función helper
+  // Parse datos de envío y facturación
   const shippingAddress = parseShippingAddress(order.shippingAddress);
+  const billingAddress = parseShippingAddress(order.billingAddress);
+  const customerData = parseShippingAddress(order.customerData);
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -109,24 +111,67 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <CreditCard className="h-5 w-5" />
               Estado y Pago
             </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Estado</p>
-                <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${statusColors[order.status]}`}>
-                  {statusLabels[order.status]}
-                </span>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Estado</p>
+                  <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${statusColors[order.status]}`}>
+                    {statusLabels[order.status]}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Moneda</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {order.currency}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${formatPrice(order.totalAmount)}
-                </p>
+
+              {/* Desglose de costos */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    ${formatPrice(order.subtotal)}
+                  </span>
+                </div>
+                {order.shipping > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Envío</span>
+                    <span className="text-gray-900 dark:text-white font-medium">
+                      ${formatPrice(order.shipping)}
+                    </span>
+                  </div>
+                )}
+                {order.discount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Descuento</span>
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      -${formatPrice(order.discount)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">Total</span>
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                    ${formatPrice(order.totalAmount)}
+                  </span>
+                </div>
               </div>
+
               {order.mpPaymentId && (
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">ID de Pago MP</p>
-                  <p className="text-sm font-mono text-gray-900 dark:text-white">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">ID de Pago Mercado Pago</p>
+                  <p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded">
                     {order.mpPaymentId}
+                  </p>
+                </div>
+              )}
+              {order.mpPreferenceId && (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">ID de Preferencia MP</p>
+                  <p className="text-sm font-mono text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded">
+                    {order.mpPreferenceId}
                   </p>
                 </div>
               )}
@@ -211,9 +256,29 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                   </p>
                 ) : (
                   <>
+                    {shippingAddress.name && (
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {shippingAddress.name}
+                      </p>
+                    )}
+                    {shippingAddress.phone && (
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Tel: {shippingAddress.phone}
+                      </p>
+                    )}
                     {shippingAddress.street && (
-                      <p className="text-gray-900 dark:text-white">
+                      <p className="text-gray-900 dark:text-white mt-2">
                         {shippingAddress.street}
+                      </p>
+                    )}
+                    {shippingAddress.number && (
+                      <p className="text-gray-900 dark:text-white">
+                        Nº {shippingAddress.number}
+                      </p>
+                    )}
+                    {shippingAddress.apartment && (
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {shippingAddress.apartment}
                       </p>
                     )}
                     {(shippingAddress.city || shippingAddress.state || shippingAddress.zipCode) && (
@@ -227,6 +292,124 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                       <p className="text-gray-900 dark:text-white">
                         {shippingAddress.country}
                       </p>
+                    )}
+                    {shippingAddress.notes && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          Notas adicionales:
+                        </p>
+                        <p className="text-gray-900 dark:text-white">
+                          {shippingAddress.notes}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {billingAddress && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Dirección de Facturación
+              </h2>
+              <div className="space-y-2 text-sm">
+                {typeof billingAddress === 'string' ? (
+                  <p className="text-gray-900 dark:text-white whitespace-pre-line">
+                    {billingAddress}
+                  </p>
+                ) : (
+                  <>
+                    {billingAddress.name && (
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {billingAddress.name}
+                      </p>
+                    )}
+                    {billingAddress.taxId && (
+                      <p className="text-gray-600 dark:text-gray-400">
+                        CUIT/DNI: {billingAddress.taxId}
+                      </p>
+                    )}
+                    {billingAddress.street && (
+                      <p className="text-gray-900 dark:text-white mt-2">
+                        {billingAddress.street}
+                        {billingAddress.number && ` ${billingAddress.number}`}
+                      </p>
+                    )}
+                    {(billingAddress.city || billingAddress.state || billingAddress.zipCode) && (
+                      <p className="text-gray-900 dark:text-white">
+                        {[billingAddress.city, billingAddress.state, billingAddress.zipCode]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </p>
+                    )}
+                    {billingAddress.country && (
+                      <p className="text-gray-900 dark:text-white">
+                        {billingAddress.country}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {customerData && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Datos Adicionales del Cliente
+              </h2>
+              <div className="space-y-2 text-sm">
+                {typeof customerData === 'string' ? (
+                  <p className="text-gray-900 dark:text-white whitespace-pre-line">
+                    {customerData}
+                  </p>
+                ) : (
+                  <>
+                    {customerData.documentType && customerData.documentNumber && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Documento</p>
+                        <p className="text-gray-900 dark:text-white">
+                          {customerData.documentType}: {customerData.documentNumber}
+                        </p>
+                      </div>
+                    )}
+                    {customerData.phone && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
+                        <p className="text-gray-900 dark:text-white">
+                          {customerData.phone}
+                        </p>
+                      </div>
+                    )}
+                    {customerData.alternativePhone && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Teléfono alternativo</p>
+                        <p className="text-gray-900 dark:text-white">
+                          {customerData.alternativePhone}
+                        </p>
+                      </div>
+                    )}
+                    {customerData.birthDate && (
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Fecha de nacimiento</p>
+                        <p className="text-gray-900 dark:text-white">
+                          {customerData.birthDate}
+                        </p>
+                      </div>
+                    )}
+                    {customerData.preferences && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          Preferencias:
+                        </p>
+                        <p className="text-gray-900 dark:text-white">
+                          {customerData.preferences}
+                        </p>
+                      </div>
                     )}
                   </>
                 )}
