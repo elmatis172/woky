@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Eye, Package } from "lucide-react";
+import { Package } from "lucide-react";
+import { OrderActions } from "@/components/admin/order-actions";
 
 export default async function OrdersAdminPage() {
   const orders = await db.order.findMany({
@@ -122,12 +123,7 @@ export default async function OrdersAdminPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                    <Link
-                      href={`/admin/ordenes/${order.id}`}
-                      className="inline-flex items-center text-blue-600 hover:text-blue-700"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
+                    <OrderActions orderId={order.id} />
                   </td>
                 </tr>
               ))}
