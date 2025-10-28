@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +67,8 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
   });
 
   const [imageUrl, setImageUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +116,52 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de archivo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor seleccioná un archivo de imagen válido');
+      return;
+    }
+
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen es muy grande. El tamaño máximo es 5MB');
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      // Convertir a base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (!formData.images.includes(base64String)) {
+          setFormData({ 
+            ...formData, 
+            images: [...formData.images, base64String] 
+          });
+        }
+        setUploadingImage(false);
+        // Resetear el input para poder subir el mismo archivo de nuevo
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      };
+      reader.onerror = () => {
+        alert('Error al leer el archivo');
+        setUploadingImage(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      alert('Error al cargar la imagen');
+      setUploadingImage(false);
+    }
+  };
+
   const addImage = () => {
     if (!imageUrl.trim()) {
       alert("Por favor ingresá una URL de imagen");
@@ -127,6 +175,10 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     
     setFormData({ ...formData, images: [...formData.images, imageUrl.trim()] });
     setImageUrl("");
+  };
+
+  const openFileDialog = () => {
+    fileInputRef.current?.click();
   };
 
   const removeImage = (index: number) => {
@@ -279,26 +331,66 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         <h2 className="text-xl font-semibold mb-4">Imágenes del Producto</h2>
         
         <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="URL de la imagen (Unsplash, Imgur, etc.)"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addImage();
-                }
-              }}
-            />
+          {/* Input file oculto */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+
+          {/* Botones de carga */}
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
-              onClick={addImage}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors whitespace-nowrap font-medium"
+              onClick={openFileDialog}
+              disabled={uploadingImage}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Agregar
+              {uploadingImage ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Subiendo...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Subir desde Computadora
+                </>
+              )}
             </button>
+            
+            <div className="flex-1 flex gap-2">
+              <Input
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="O pegá una URL de imagen"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addImage();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={addImage}
+                className="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 transition-colors whitespace-nowrap font-medium"
+              >
+                Agregar URL
+              </button>
+            </div>
           </div>
+
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Podés subir imágenes desde tu computadora (máx. 5MB) o pegar URLs de servicios como Unsplash o Imgur
+          </p>
 
           {formData.images.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
