@@ -50,7 +50,7 @@ export async function PUT(
 
     const { id } = await context.params;
     const body = await request.json();
-    const { name, slug, description } = body;
+    const { name, slug, description, image } = body;
 
     const existingCategory = await db.category.findUnique({
       where: { id },
@@ -80,6 +80,7 @@ export async function PUT(
         name,
         slug,
         description: description || null,
+        image: image || null,
       },
     });
 
