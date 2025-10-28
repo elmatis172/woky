@@ -1,14 +1,16 @@
 import { env } from "@/lib/env";
 import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
 
-// Inicializar cliente de Mercado Pago
-const client = new MercadoPagoConfig({
-  accessToken: env.MP_ACCESS_TOKEN,
-  options: { timeout: 5000 },
-});
+// Inicializar cliente de Mercado Pago solo si hay token
+const client = env.MP_ACCESS_TOKEN 
+  ? new MercadoPagoConfig({
+      accessToken: env.MP_ACCESS_TOKEN,
+      options: { timeout: 5000 },
+    })
+  : null;
 
-export const preferenceClient = new Preference(client);
-export const paymentClient = new Payment(client);
+export const preferenceClient = client ? new Preference(client) : null;
+export const paymentClient = client ? new Payment(client) : null;
 
 /**
  * Crea una preferencia de pago en Mercado Pago
@@ -26,6 +28,10 @@ export async function createPreference(data: {
     email?: string;
   };
 }) {
+  if (!preferenceClient) {
+    throw new Error("Mercado Pago no está configurado. Agrega MP_ACCESS_TOKEN en las variables de entorno.");
+  }
+
   const publicUrl = env.NEXTAUTH_URL || "http://localhost:3000";
 
   const preference = await preferenceClient.create({
@@ -54,6 +60,10 @@ export async function createPreference(data: {
  * Obtiene información de un pago
  */
 export async function getPayment(paymentId: string) {
+  if (!paymentClient) {
+    throw new Error("Mercado Pago no está configurado. Agrega MP_ACCESS_TOKEN en las variables de entorno.");
+  }
+
   try {
     const payment = await paymentClient.get({ id: paymentId });
     return payment;
