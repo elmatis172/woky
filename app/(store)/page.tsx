@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { HeroSection } from "@/components/hero-section";
 import { FeaturedProducts } from "@/components/featured-products";
 import { CategoriesGrid } from "@/components/categories-grid";
+import { parseImages } from "@/lib/json-helpers";
 
 export const metadata = {
   title: "Inicio",
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default async function HomePage() {
   // Obtener productos destacados
-  const featuredProducts = await db.product.findMany({
+  const rawProducts = await db.product.findMany({
     where: {
       status: "PUBLISHED",
       featured: true,
@@ -20,6 +21,12 @@ export default async function HomePage() {
       createdAt: "desc",
     },
   });
+
+  // Parsear images de string a array
+  const featuredProducts = rawProducts.map((product: any) => ({
+    ...product,
+    images: parseImages(product.images),
+  }));
 
   // Obtener categorías
   const categories = await db.category.findMany({

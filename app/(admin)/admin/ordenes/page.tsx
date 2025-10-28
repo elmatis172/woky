@@ -14,20 +14,18 @@ export default async function OrdersAdminPage() {
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-    PROCESSING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    SHIPPED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    DELIVERED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    COMPLETED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    PAID: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    FAILED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    REFUNDED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    CANCELLED: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
   };
 
   const statusLabels: Record<string, string> = {
     PENDING: "Pendiente",
-    PROCESSING: "Procesando",
-    SHIPPED: "Enviado",
-    DELIVERED: "Entregado",
-    CANCELLED: "Cancelado",
-    COMPLETED: "Completado",
+    PAID: "Pagada",
+    FAILED: "Fallida",
+    REFUNDED: "Reembolsada",
+    CANCELLED: "Cancelada",
   };
 
   return (
@@ -76,7 +74,7 @@ export default async function OrdersAdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {orders.map((order) => (
+              {orders.map((order: any) => (
                 <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">

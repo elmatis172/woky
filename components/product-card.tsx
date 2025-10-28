@@ -11,7 +11,7 @@ interface ProductCardProps {
     slug: string;
     price: number;
     compareAtPrice: number | null;
-    images: string;  // JSON string
+    images: string | string[];  // JSON string o array
     stock: number;
     featured?: boolean;
   };
@@ -24,7 +24,9 @@ export function ProductCard({ product }: ProductCardProps) {
     ? calculateDiscount(product.compareAtPrice!, product.price)
     : 0;
 
-  const images = JSON.parse(product.images || "[]");
+  const images = typeof product.images === 'string' 
+    ? JSON.parse(product.images || "[]")
+    : product.images;
 
   return (
     <Link href={`/productos/${product.slug}`}>

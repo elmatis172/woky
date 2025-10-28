@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { ProductGrid } from "@/components/product-grid";
 import { ProductFilters } from "@/components/product-filters";
+import { parseImages } from "@/lib/json-helpers";
 
 export const metadata = {
   title: "Productos",
@@ -57,13 +58,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   }
 
   // Obtener productos
-  const products = await db.product.findMany({
+  const rawProducts = await db.product.findMany({
     where,
     orderBy,
     include: {
       category: true,
     },
   });
+
+  // Parsear images de string a array
+  const products = rawProducts.map((product: any) => ({
+    ...product,
+    images: parseImages(product.images),
+  }));
 
   // Obtener categorías para el filtro
   const categories = await db.category.findMany({

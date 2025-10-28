@@ -78,14 +78,14 @@ export async function POST(req: NextRequest) {
         shipping,
         discount,
         totalAmount,
-        customerData: customerData || {},
-        timeline: [
+        customerData: JSON.stringify(customerData || {}),
+        timeline: JSON.stringify([
           {
             status: "PENDING",
             timestamp: new Date().toISOString(),
             note: "Orden creada",
           },
-        ],
+        ]),
         items: {
           create: orderItems,
         },

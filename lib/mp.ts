@@ -30,10 +30,10 @@ export async function createPreference(data: {
 
   const preference = await preferenceClient.create({
     body: {
-      items: data.items.map((item) => ({
+      items: data.items.map((item: any) => ({
         ...item,
         currency_id: item.currency_id || "ARS",
-      })),
+      })) as any,
       payer: data.payer,
       back_urls: {
         success: `${publicUrl}/ok?order=${data.orderId}`,

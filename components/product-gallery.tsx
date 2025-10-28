@@ -38,7 +38,7 @@ export function ProductGallery({ images: imagesString, name }: ProductGalleryPro
       {/* Miniaturas */}
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-4">
-          {images.map((image, index) => (
+          {images.map((image: string, index: number) => (
             <button
               key={index}
               onClick={() => setSelectedImage(index)}

@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Determinar el nuevo estado según el status del pago
-    let newStatus: "PAID" | "FAILED" | "CANCELLED" | "PENDING" = "PENDING";
+    let newStatus: "PAID" | "FAILED" | "CANCELLED" | "PENDING" | "REFUNDED" = "PENDING";
     let note = "";
 
     switch (payment.status) {
@@ -107,21 +107,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Actualizar la orden
+    const currentTimeline = order.timeline ? JSON.parse(order.timeline as string) : [];
+    const updatedTimeline = [
+      ...currentTimeline,
+      {
+        status: newStatus,
+        timestamp: new Date().toISOString(),
+        note,
+        paymentId: payment.id,
+        paymentStatus: payment.status,
+      },
+    ];
+
     const updatedOrder = await db.order.update({
       where: { id: orderId },
       data: {
         status: newStatus,
         mpPaymentId: payment.id?.toString(),
-        timeline: [
-          ...((order.timeline as any[]) || []),
-          {
-            status: newStatus,
-            timestamp: new Date().toISOString(),
-            note,
-            paymentId: payment.id,
-            paymentStatus: payment.status,
-          },
-        ],
+        timeline: JSON.stringify(updatedTimeline),
       },
     });
 

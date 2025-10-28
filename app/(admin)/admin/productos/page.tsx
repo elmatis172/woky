@@ -85,7 +85,7 @@ export default async function ProductsAdminPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                      {product.category.name}
+                      {product.category?.name || "Sin categoría"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
                       ${product.price.toLocaleString("es-AR")}

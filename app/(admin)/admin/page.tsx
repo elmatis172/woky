@@ -30,10 +30,10 @@ export default async function AdminDashboard() {
     }),
   ]);
 
-  // Calcular ingresos totales
+  // Calcular ingresos totales (solo órdenes pagadas)
   const allOrders = await db.order.findMany({
     where: {
-      status: { in: ["COMPLETED", "PROCESSING", "SHIPPED"] },
+      status: "PAID",
     },
   });
   
@@ -162,14 +162,22 @@ export default async function AdminDashboard() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        order.status === "COMPLETED"
+                        order.status === "PAID"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                           : order.status === "PENDING"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          : order.status === "FAILED"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                          : order.status === "CANCELLED"
+                          ? "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                          : "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
                       }`}
                     >
-                      {order.status}
+                      {order.status === "PAID" ? "Pagada" : 
+                       order.status === "PENDING" ? "Pendiente" : 
+                       order.status === "FAILED" ? "Fallida" :
+                       order.status === "CANCELLED" ? "Cancelada" :
+                       order.status === "REFUNDED" ? "Reembolsada" : order.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">

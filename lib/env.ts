@@ -14,7 +14,7 @@ export const env = createEnv({
     MP_ACCESS_TOKEN: z.string().min(1),
     UPLOADTHING_SECRET: z.string().optional(),
     UPLOADTHING_APP_ID: z.string().optional(),
-    UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+    UPSTASH_REDIS_REST_URL: z.string().url().or(z.literal("")).optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   },
   client: {

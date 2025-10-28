@@ -28,7 +28,7 @@ const credentialsSchema = z.object({
 });
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as any,
   providers: [
     CredentialsProvider({
       name: "credentials",
