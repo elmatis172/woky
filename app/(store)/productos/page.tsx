@@ -8,17 +8,17 @@ export const metadata = {
 };
 
 interface ProductsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     cat?: string;
     min?: string;
     max?: string;
     sort?: string;
-  };
+  }>;
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const { q, cat, min, max, sort = "newest" } = searchParams;
+  const { q, cat, min, max, sort = "newest" } = await searchParams;
 
   // Construir filtros
   const where: any = {
