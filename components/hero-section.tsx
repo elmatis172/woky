@@ -27,14 +27,14 @@ export function HeroSection() {
               La mejor ropa para niños y niñas. Calidad, comodidad y diseños únicos. Envíos a todo el país con pago seguro por Mercado Pago.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
-              {/* @ts-ignore */}
+              {/* @ts-expect-error - Button size prop type issue */}
               <Button asChild size="lg">
                 <Link href="/productos">
                   Ver productos
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              {/* @ts-ignore */}
+              {/* @ts-expect-error - Button size prop type issue */}
               <Button asChild size="lg" variant="outline">
                 <Link href="/productos?featured=true">
                   Destacados
