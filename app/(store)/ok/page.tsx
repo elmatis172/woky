@@ -22,6 +22,9 @@ export default async function OkPage({
       email: true,
       status: true,
       totalAmount: true,
+      subtotal: true,
+      shipping: true,
+      discount: true,
       createdAt: true,
       shippingAddress: true,
       billingAddress: true,
@@ -30,7 +33,7 @@ export default async function OkPage({
         select: {
           id: true,
           quantity: true,
-          price: true,
+          unitPrice: true,
           product: {
             select: {
               id: true,
