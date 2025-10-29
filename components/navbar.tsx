@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { NavbarClient } from "./navbar-client";
 import { auth } from "@/lib/auth";
+import { WokyLogo } from "./woky-logo";
 
 export async function Navbar() {
   const session = await auth();
@@ -12,7 +13,7 @@ export async function Navbar() {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
             <ShoppingCart className="h-6 w-6" />
-            <span className="text-xl font-bold">Woky Kids</span>
+            <WokyLogo className="text-xl" /> <span className="font-bold text-xl">Kids</span>
           </Link>
 
           <nav className="hidden md:flex gap-6">

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
+import { WokyLogo } from "@/components/woky-logo";
 import { 
   LayoutDashboard, 
   Package, 
@@ -41,7 +42,7 @@ export default async function AdminLayout({
             <Package className="h-8 w-8 text-blue-600" />
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                Woky Kids
+                <WokyLogo /> <span>Kids</span>
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400">Panel Admin</p>
             </div>

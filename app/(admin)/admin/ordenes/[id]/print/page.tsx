@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { PrintActions } from "@/components/admin/print-actions";
+import { WokyLogo } from "@/components/woky-logo";
 
 // Funciones helper
 function formatPrice(amount: number): string {
@@ -130,7 +131,9 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           <div className="border-b-2 border-gray-800 pb-2 mb-3 print:pb-1 print:mb-2">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-1 print:text-xl print:mb-0">WOKY KIDS</h1>
+                <h1 className="text-4xl font-bold text-gray-900 mb-1 print:text-xl print:mb-0">
+                  <WokyLogo /> <span>KIDS</span>
+                </h1>
                 <p className="text-gray-600 print:text-[10px]">Orden de Preparación</p>
               </div>
               <div className="text-right">

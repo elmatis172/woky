@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import { WokyLogo } from "./woky-logo";
 
 export function Footer() {
   return (
@@ -7,7 +8,9 @@ export function Footer() {
       <div className="container py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="mb-4 text-lg font-semibold">Woky Kids</h3>
+            <h3 className="mb-4 text-lg font-semibold">
+              <WokyLogo /> <span>Kids</span>
+            </h3>
             <p className="text-sm text-muted-foreground">
               La mejor moda infantil para tus hijos. Ropa cómoda y de calidad.
             </p>
@@ -124,7 +127,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Woky Store. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} <WokyLogo className="text-sm" /> Store. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
