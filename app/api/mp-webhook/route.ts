@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
         userId: true,
         email: true,
         totalAmount: true,
+        timeline: true,
       },
     });
 
