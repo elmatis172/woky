@@ -28,7 +28,8 @@ const credentialsSchema = z.object({
 });
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(db) as any,
+  // TEMPORALMENTE DESHABILITADO: adapter: PrismaAdapter(db) as any,
+  // El adapter causa errores porque intenta acceder a tablas con schema antiguo
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -42,6 +43,15 @@ export const authConfig: NextAuthConfig = {
 
           const user = await db.user.findUnique({
             where: { email },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              image: true,
+              role: true,
+              blocked: true,
+              password: true,
+            },
           });
 
           if (!user || !user.password) {
