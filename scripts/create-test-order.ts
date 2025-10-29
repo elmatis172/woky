@@ -65,7 +65,7 @@ async function main() {
           {
             productId: product.id,
             quantity: 2,
-            price: product.price,
+            unitPrice: product.price,
           },
         ],
       },
