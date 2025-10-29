@@ -29,6 +29,22 @@ export default async function OrdersAdminPage() {
     CANCELLED: "Cancelada",
   };
 
+  const shippingStatusColors: Record<string, string> = {
+    PENDING: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300",
+    PROCESSING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    SHIPPED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    DELIVERED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  };
+
+  const shippingStatusLabels: Record<string, string> = {
+    PENDING: "Pendiente",
+    PROCESSING: "Procesando",
+    SHIPPED: "Despachado",
+    DELIVERED: "Entregado",
+    CANCELLED: "Cancelado",
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -64,10 +80,10 @@ export default async function OrdersAdminPage() {
                   Total
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Estado
+                  Pago
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Pago
+                  Envío
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Acciones
@@ -114,12 +130,10 @@ export default async function OrdersAdminPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        order.mpPaymentId
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                        shippingStatusColors[order.shippingStatus || "PENDING"]
                       }`}
                     >
-                      {order.mpPaymentId ? "Pagado" : "Pendiente"}
+                      {shippingStatusLabels[order.shippingStatus || "PENDING"]}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">

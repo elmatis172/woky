@@ -29,6 +29,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum ShippingStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -132,29 +140,31 @@ model Product {
 }
 
 model Order {
-  id              String      @id @default(cuid())
+  id              String         @id @default(cuid())
   userId          String?
-  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   email           String
-  status          OrderStatus @default(PENDING)
-  currency        String      @default("ARS")
-  subtotal        Int         // En centavos
-  shipping        Int         @default(0)
-  discount        Int         @default(0)
-  totalAmount     Int         // En centavos
-  mpPreferenceId  String?     @unique
-  mpPaymentId     String?     @unique
-  timeline        String?     // JSON string de array de eventos
-  shippingAddress String?     // JSON string de dirección
-  billingAddress  String?     // JSON string de dirección de facturación
-  customerData    String?     // JSON string de datos del cliente
+  status          OrderStatus    @default(PENDING)
+  shippingStatus  ShippingStatus @default(PENDING)
+  currency        String         @default("ARS")
+  subtotal        Int            // En centavos
+  shipping        Int            @default(0)
+  discount        Int            @default(0)
+  totalAmount     Int            // En centavos
+  mpPreferenceId  String?        @unique
+  mpPaymentId     String?        @unique
+  timeline        String?        // JSON string de array de eventos
+  shippingAddress String?        // JSON string de dirección
+  billingAddress  String?        // JSON string de dirección de facturación
+  customerData    String?        // JSON string de datos del cliente
   items           OrderItem[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@index([userId])
   @@index([email])
   @@index([status])
+  @@index([shippingStatus])
   @@index([mpPaymentId])
 }
 
