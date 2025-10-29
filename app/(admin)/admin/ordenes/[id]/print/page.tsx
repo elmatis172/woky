@@ -73,7 +73,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
         select: {
           id: true,
           quantity: true,
-          price: true,
+          unitPrice: true,
           product: {
             select: {
               id: true,
@@ -268,16 +268,17 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
                       )}
                     </td>
                     <td className="p-3 border-b border-gray-300 text-right text-gray-900">
-                      ${formatPrice(item.price)}
+                      ${formatPrice(item.unitPrice)}
                     </td>
                     <td className="p-3 border-b border-gray-300 text-right font-semibold text-gray-900">
-                      ${formatPrice(item.quantity * item.price)}
+                      ${formatPrice(item.quantity * item.unitPrice)}
                     </td>
                     <td className="p-3 border-b border-gray-300 text-center">
                       <div className="w-8 h-8 border-2 border-gray-400 rounded mx-auto"></div>
                     </td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>

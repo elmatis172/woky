@@ -71,7 +71,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         select: {
           id: true,
           quantity: true,
-          price: true,
+          unitPrice: true,
           product: {
             select: {
               id: true,
@@ -219,12 +219,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                       {item.product?.name || "Producto eliminado"}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Cantidad: {item.quantity} × ${formatPrice(item.price)}
+                      Cantidad: {item.quantity} × ${formatPrice(item.unitPrice)}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-gray-900 dark:text-white">
-                      ${formatPrice(item.quantity * item.price)}
+                      ${formatPrice(item.quantity * item.unitPrice)}
                     </p>
                   </div>
                 </div>
