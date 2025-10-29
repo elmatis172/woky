@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,6 +25,19 @@ interface CartItem {
 export default function CarritoPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [shippingData, setShippingData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    street: "",
+    number: "",
+    floor: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    notes: "",
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +72,13 @@ export default function CarritoPage() {
   const total = subtotal + shipping;
 
   const handleCheckout = async () => {
+    // Validar que todos los campos requeridos estén completos
+    if (!shippingData.fullName || !shippingData.email || !shippingData.phone || 
+        !shippingData.street || !shippingData.city || !shippingData.province) {
+      alert("Por favor completá todos los campos requeridos");
+      return;
+    }
+
     // Crear orden y redirigir a Mercado Pago
     try {
       const response = await fetch("/api/mp", {
@@ -67,7 +89,22 @@ export default function CarritoPage() {
             productId: item.id,
             quantity: item.quantity,
           })),
-          email: "cliente@example.com", // Esto debería venir del usuario logueado
+          email: shippingData.email,
+          customerData: {
+            fullName: shippingData.fullName,
+            email: shippingData.email,
+            phone: shippingData.phone,
+            shippingAddress: {
+              street: shippingData.street,
+              number: shippingData.number,
+              floor: shippingData.floor,
+              city: shippingData.city,
+              province: shippingData.province,
+              postalCode: shippingData.postalCode,
+              country: "Argentina",
+            },
+            notes: shippingData.notes,
+          },
         }),
       });
 
@@ -75,13 +112,17 @@ export default function CarritoPage() {
       console.log("MP Response:", data);
       
       if (data.initPoint) {
+        // Limpiar carrito
+        localStorage.removeItem("cart");
         // Redirigir a Mercado Pago
         window.location.href = data.initPoint;
       } else {
         console.error("No se recibió initPoint:", data);
+        alert("Hubo un error al procesar tu pedido. Por favor intentá de nuevo.");
       }
     } catch (error) {
       console.error("Error al crear orden:", error);
+      alert("Hubo un error al procesar tu pedido. Por favor intentá de nuevo.");
     }
   };
 
@@ -188,48 +229,211 @@ export default function CarritoPage() {
           ))}
         </div>
 
-        {/* Resumen */}
+        {/* Resumen y Formulario de Envío */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-20">
-            <CardHeader>
-              <CardTitle>Resumen del Pedido</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Envío</span>
-                <span>
-                  {shipping === 0 ? (
-                    <span className="text-green-600 font-semibold">¡Gratis!</span>
-                  ) : (
-                    formatPrice(shipping)
-                  )}
-                </span>
-              </div>
-              <Separator />
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
+          {!showCheckoutForm ? (
+            // Resumen del Pedido
+            <Card className="sticky top-20">
+              <CardHeader>
+                <CardTitle>Resumen del Pedido</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Envío</span>
+                  <span>
+                    {shipping === 0 ? (
+                      <span className="text-green-600 font-semibold">¡Gratis!</span>
+                    ) : (
+                      formatPrice(shipping)
+                    )}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span>{formatPrice(total)}</span>
+                </div>
 
-              {subtotal < 50000 && (
-                <p className="text-xs text-muted-foreground">
-                  Agregá {formatPrice(50000 - subtotal)} más para envío gratis
-                </p>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-              <Button className="w-full" size="lg" onClick={handleCheckout}>
-                Finalizar Compra
-              </Button>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/productos">Seguir Comprando</Link>
-              </Button>
-            </CardFooter>
-          </Card>
+                {subtotal < 50000 && (
+                  <p className="text-xs text-muted-foreground">
+                    Agregá {formatPrice(50000 - subtotal)} más para envío gratis
+                  </p>
+                )}
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                <Button 
+                  className="w-full" 
+                  onClick={() => setShowCheckoutForm(true)}
+                >
+                  Continuar con el Envío
+                </Button>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/productos">Seguir Comprando</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ) : (
+            // Formulario de Datos de Envío
+            <Card className="sticky top-20">
+              <CardHeader>
+                <CardTitle>Datos de Envío</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Nombre y Apellido *</Label>
+                  <Input
+                    id="fullName"
+                    value={shippingData.fullName}
+                    onChange={(e) => setShippingData({...shippingData, fullName: e.target.value})}
+                    placeholder="Juan Pérez"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={shippingData.email}
+                    onChange={(e) => setShippingData({...shippingData, email: e.target.value})}
+                    placeholder="tu@email.com"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Teléfono *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={shippingData.phone}
+                    onChange={(e) => setShippingData({...shippingData, phone: e.target.value})}
+                    placeholder="11 1234-5678"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="street">Calle *</Label>
+                    <Input
+                      id="street"
+                      value={shippingData.street}
+                      onChange={(e) => setShippingData({...shippingData, street: e.target.value})}
+                      placeholder="Av. Corrientes"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="number">Número *</Label>
+                    <Input
+                      id="number"
+                      value={shippingData.number}
+                      onChange={(e) => setShippingData({...shippingData, number: e.target.value})}
+                      placeholder="1234"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="floor">Piso/Depto (opcional)</Label>
+                  <Input
+                    id="floor"
+                    value={shippingData.floor}
+                    onChange={(e) => setShippingData({...shippingData, floor: e.target.value})}
+                    placeholder="5° A"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Ciudad *</Label>
+                    <Input
+                      id="city"
+                      value={shippingData.city}
+                      onChange={(e) => setShippingData({...shippingData, city: e.target.value})}
+                      placeholder="CABA"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="province">Provincia *</Label>
+                    <Input
+                      id="province"
+                      value={shippingData.province}
+                      onChange={(e) => setShippingData({...shippingData, province: e.target.value})}
+                      placeholder="Buenos Aires"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Código Postal</Label>
+                  <Input
+                    id="postalCode"
+                    value={shippingData.postalCode}
+                    onChange={(e) => setShippingData({...shippingData, postalCode: e.target.value})}
+                    placeholder="C1043"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notas (opcional)</Label>
+                  <Input
+                    id="notes"
+                    value={shippingData.notes}
+                    onChange={(e) => setShippingData({...shippingData, notes: e.target.value})}
+                    placeholder="Instrucciones de entrega..."
+                  />
+                </div>
+
+                <Separator />
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatPrice(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Envío</span>
+                    <span>
+                      {shipping === 0 ? (
+                        <span className="text-green-600 font-semibold">¡Gratis!</span>
+                      ) : (
+                        formatPrice(shipping)
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                <Button 
+                  className="w-full" 
+                  onClick={handleCheckout}
+                >
+                  Finalizar Compra
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => setShowCheckoutForm(false)}
+                >
+                  Volver
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
         </div>
       </div>
     </div>
