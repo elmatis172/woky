@@ -50,7 +50,7 @@ export function NavbarClient({ session }: NavbarClientProps) {
       </Button>
 
       <Button variant="ghost" size="icon" asChild>
-        <Link href={session ? "/perfil" : "/sign-in"}>
+        <Link href={session ? "/admin/perfil" : "/sign-in"}>
           <User className="h-5 w-5" />
           <span className="sr-only">Cuenta</span>
         </Link>
