@@ -39,15 +39,15 @@ export async function DELETE(
     // Registrar en audit log
     await db.auditLog.create({
       data: {
-        userId: session.user.id,
+        actorId: session.user.id,
         action: "DELETE",
         entity: "Order",
         entityId: orderId,
-        details: JSON.stringify({
+        metadata: {
           orderEmail: order.email,
           totalAmount: order.totalAmount,
           status: order.status,
-        }),
+        },
       },
     });
 
