@@ -1,10 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 export function PrintActions() {
+  const router = useRouter();
+
   return (
     <div className="no-print mb-6 flex justify-between items-center">
       <button
-        onClick={() => window.history.back()}
+        onClick={() => router.back()}
         className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
       >
         ← Volver
