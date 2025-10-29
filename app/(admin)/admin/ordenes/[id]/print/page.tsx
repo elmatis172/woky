@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { PrintActions } from "@/components/admin/print-actions";
 
 // Funciones helper
 function formatPrice(amount: number): string {
@@ -121,20 +122,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   return (
     <div className="min-h-screen bg-white p-8 print:p-0">
         {/* Botón Imprimir - Solo visible en pantalla */}
-        <div className="no-print mb-6 flex justify-between items-center">
-          <button
-            onClick={() => window.history.back()}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-          >
-            ← Volver
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            🖨️ Imprimir
-          </button>
-        </div>
+        <PrintActions />
 
         {/* Contenido imprimible */}
         <div className="max-w-4xl mx-auto bg-white">
