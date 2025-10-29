@@ -1,16 +1,23 @@
 import { db } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+type RouteContext = {
+  params: Promise<{ orderId: string }>;
+};
+
 export async function DELETE(
-  req: NextRequest,
-  context: { params: Promise<{ orderId: string }> }
+  request: Request,
+  context: RouteContext
 ) {
   try {
+    console.log("DELETE /api/admin/orders/[orderId] - Start");
+    
     // Verificar autenticación
     const session = await auth();
     
     if (!session?.user || session.user.role !== "ADMIN") {
+      console.log("DELETE /api/admin/orders/[orderId] - Unauthorized");
       return NextResponse.json(
         { error: "No autorizado" },
         { status: 401 }
@@ -18,6 +25,7 @@ export async function DELETE(
     }
 
     const { orderId } = await context.params;
+    console.log("DELETE /api/admin/orders/[orderId] - Order ID:", orderId);
 
     // Verificar que la orden existe
     const order = await db.order.findUnique({
