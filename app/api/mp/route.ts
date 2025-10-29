@@ -22,10 +22,14 @@ const createOrderSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log("MP API - Received body:", JSON.stringify(body, null, 2));
+    
     const { items, email, customerData } = createOrderSchema.parse(body);
 
     // Obtener productos y verificar stock
     const productIds = items.map((item) => item.productId);
+    console.log("MP API - Fetching products:", productIds);
+    
     const products = await db.product.findMany({
       where: {
         id: { in: productIds },
@@ -33,7 +37,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("MP API - Found products:", products.length);
+
     if (products.length !== items.length) {
+      console.error("MP API - Product count mismatch:", {
+        requested: items.length,
+        found: products.length,
+      });
       return NextResponse.json(
         { error: "Algunos productos no están disponibles" },
         { status: 400 }
@@ -42,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Verificar stock suficiente
     const orderItems = items.map((item) => {
-      const product = products.find((p) => p.id === item.productId);
+      const product = products.find((p: any) => p.id === item.productId);
       if (!product) {
         throw new Error("Producto no encontrado");
       }
@@ -59,6 +69,8 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    console.log("MP API - Order items prepared:", orderItems.length);
+
     // Calcular totales
     const subtotal = orderItems.reduce(
       (sum, item) => sum + item.unitPrice * item.quantity,
@@ -67,6 +79,13 @@ export async function POST(req: NextRequest) {
     const shipping = 0; // Calcular según lógica de envío
     const discount = 0; // Aplicar cupones si existen
     const totalAmount = subtotal + shipping - discount;
+
+    console.log("MP API - Totals calculated:", {
+      subtotal,
+      shipping,
+      discount,
+      totalAmount,
+    });
 
     // Crear orden en base de datos
     const order = await db.order.create({
@@ -106,6 +125,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("MP API - Order created:", order.id);
+
     // Crear preferencia de Mercado Pago
     const preferenceItems = orderItems.map((item) => ({
       title: item.name,
@@ -113,6 +134,8 @@ export async function POST(req: NextRequest) {
       unit_price: item.unitPrice / 100, // MP trabaja en pesos, no centavos
       currency_id: "ARS",
     }));
+
+    console.log("MP API - Creating MP preference with items:", preferenceItems);
 
     const preference = await createPreference({
       orderId: order.id,
@@ -123,6 +146,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("MP API - Preference created:", preference.id);
+
     // Actualizar orden con el preference_id
     await db.order.update({
       where: { id: order.id },
@@ -132,6 +157,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("MP API - Order updated with preference ID");
+
     return NextResponse.json({
       orderId: order.id,
       preferenceId: preference.id,
@@ -139,9 +166,11 @@ export async function POST(req: NextRequest) {
       sandboxInitPoint: preference.sandbox_init_point,
     });
   } catch (error) {
-    console.error("Error creating MP preference:", error);
+    console.error("MP API - Error details:", error);
+    console.error("MP API - Error stack:", error instanceof Error ? error.stack : "No stack trace");
 
     if (error instanceof z.ZodError) {
+      console.error("MP API - Zod validation error:", error.errors);
       return NextResponse.json(
         { error: "Datos inválidos", details: error.errors },
         { status: 400 }
@@ -149,6 +178,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (error instanceof Error) {
+      console.error("MP API - Error message:", error.message);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
