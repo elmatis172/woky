@@ -16,8 +16,19 @@ export default async function OrdersAdminPage() {
   let orders;
   try {
     orders = await db.order.findMany({
-      include: {
-        user: true,
+      select: {
+        id: true,
+        userId: true,
+        email: true,
+        status: true,
+        totalAmount: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
