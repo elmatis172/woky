@@ -20,19 +20,22 @@ export function OrderActionsWithDelete({ orderId }: OrderActionsWithDeleteProps)
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/admin/orders/delete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
       });
 
       if (!response.ok) {
-        throw new Error("Error al eliminar la orden");
+        const error = await response.json();
+        throw new Error(error.error || "Error al eliminar la orden");
       }
 
       alert("Orden eliminada correctamente");
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
-      alert("Hubo un error al eliminar la orden");
+      alert(error instanceof Error ? error.message : "Hubo un error al eliminar la orden");
     } finally {
       setIsDeleting(false);
     }
