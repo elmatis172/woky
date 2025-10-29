@@ -120,156 +120,130 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   // };
 
   return (
-    <div className="min-h-screen bg-white p-8 print:p-0">
+    <div className="min-h-screen bg-white p-8 print:p-0 print:m-0">
         {/* Botón Imprimir - Solo visible en pantalla */}
         <PrintActions />
 
-        {/* Contenido imprimible */}
-        <div className="max-w-5xl mx-auto bg-white print:max-w-full">
-          {/* Header */}
-          <div className="border-b-4 border-gray-800 pb-6 mb-6">
+        {/* Contenido imprimible - Optimizado para A4 */}
+        <div className="max-w-5xl mx-auto bg-white print:max-w-full print:p-3 print:text-xs">
+          {/* Header - Compacto */}
+          <div className="border-b-2 border-gray-800 pb-2 mb-3 print:pb-1 print:mb-2">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">WOKY KIDS</h1>
-                <p className="text-gray-600">Orden de Preparación</p>
+                <h1 className="text-4xl font-bold text-gray-900 mb-1 print:text-xl print:mb-0">WOKY KIDS</h1>
+                <p className="text-gray-600 print:text-[10px]">Orden de Preparación</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600">Orden #</p>
-                <p className="text-2xl font-bold text-gray-900">{order.id.slice(0, 8)}</p>
-                <p className="text-sm text-gray-600 mt-2">{formatDate(order.createdAt)}</p>
+                <p className="text-sm text-gray-600 print:text-[9px]">Orden #</p>
+                <p className="text-2xl font-bold text-gray-900 print:text-base">{order.id.slice(0, 8)}</p>
+                <p className="text-sm text-gray-600 mt-1 print:text-[9px] print:mt-0">{formatDate(order.createdAt)}</p>
               </div>
             </div>
           </div>
 
-          {/* Estados */}
-          <div className="grid grid-cols-1 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+          {/* Estados - Compacto */}
+          <div className="mb-4 p-3 bg-gray-50 rounded print:mb-2 print:p-1.5">
             <div>
-              <p className="text-sm text-gray-600 font-medium">Estado de Pago</p>
-              <p className="text-lg font-bold text-gray-900">{statusLabels[order.status]}</p>
+              <span className="text-sm text-gray-600 font-medium print:text-[9px]">Estado de Pago: </span>
+              <span className="text-lg font-bold text-gray-900 print:text-xs">{statusLabels[order.status]}</span>
             </div>
-            {/* Estado de envío deshabilitado temporalmente */}
-            {/* <div>
-              <p className="text-sm text-gray-600 font-medium">Estado de Envío</p>
-              <p className="text-lg font-bold text-gray-900">{shippingStatusLabels[order.shippingStatus || "PENDING"]}</p>
-            </div> */}
           </div>
 
-          {/* Información del Cliente */}
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-gray-300 pb-2">
+          {/* Información del Cliente - Compacto */}
+          <div className="mb-4 print:mb-2">
+            <h2 className="text-lg font-bold text-gray-900 mb-2 border-b border-gray-300 pb-1 print:text-xs print:mb-1 print:pb-0.5">
               📋 DATOS DEL CLIENTE
             </h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2 print:gap-1">
               <div>
-                <p className="text-sm text-gray-600">Nombre</p>
-                <p className="font-medium text-gray-900">{order.user?.name || "N/A"}</p>
+                <span className="text-sm text-gray-600 print:text-[9px]">Nombre: </span>
+                <span className="font-medium text-gray-900 print:text-[10px]">{customerData?.name || order.user?.name || "N/A"}</span>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="font-medium text-gray-900">{order.email}</p>
+                <span className="text-sm text-gray-600 print:text-[9px]">Email: </span>
+                <span className="font-medium text-gray-900 print:text-[9px]">{order.email}</span>
               </div>
               {customerData?.phone && (
-                <div>
-                  <p className="text-sm text-gray-600">Teléfono</p>
-                  <p className="font-medium text-gray-900">{customerData.phone}</p>
-                </div>
-              )}
-              {customerData?.documentNumber && (
-                <div>
-                  <p className="text-sm text-gray-600">Documento</p>
-                  <p className="font-medium text-gray-900">
-                    {customerData.documentType || "DNI"}: {customerData.documentNumber}
-                  </p>
+                <div className="col-span-2">
+                  <span className="text-sm text-gray-600 print:text-[9px]">Teléfono: </span>
+                  <span className="font-medium text-gray-900 print:text-[10px]">{customerData.phone}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Dirección de Envío */}
-          <div className="mb-6 p-4 border-2 border-gray-800 rounded-lg bg-yellow-50">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
+          {/* Dirección de Envío - Compacto */}
+          <div className="mb-4 p-3 border-2 border-gray-800 rounded bg-yellow-50 print:mb-2 print:p-1.5 print:border">
+            <h2 className="text-lg font-bold text-gray-900 mb-2 print:text-xs print:mb-1">
               📦 DIRECCIÓN DE ENVÍO
             </h2>
             {shippingAddress ? (
               typeof shippingAddress === 'string' ? (
-                <p className="text-gray-900 whitespace-pre-line font-medium">{shippingAddress}</p>
+                <p className="text-gray-900 font-medium print:text-[10px] print:leading-tight">{shippingAddress}</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1 print:space-y-0 print:text-[10px] print:leading-tight">
                   {shippingAddress.name && (
-                    <p className="font-bold text-gray-900 text-lg">{shippingAddress.name}</p>
+                    <p className="font-bold text-gray-900">{shippingAddress.name}</p>
                   )}
                   {shippingAddress.phone && (
-                    <p className="text-gray-900">
-                      <span className="font-semibold">Tel:</span> {shippingAddress.phone}
-                    </p>
+                    <span className="text-gray-900">Tel: {shippingAddress.phone} | </span>
                   )}
                   {shippingAddress.street && (
-                    <p className="text-gray-900 font-medium">
+                    <span className="text-gray-900 font-medium">
                       {shippingAddress.street}
                       {shippingAddress.number && ` ${shippingAddress.number}`}
-                    </p>
-                  )}
-                  {shippingAddress.apartment && (
-                    <p className="text-gray-900">{shippingAddress.apartment}</p>
+                      {shippingAddress.apartment && `, ${shippingAddress.apartment}`}
+                    </span>
                   )}
                   {(shippingAddress.city || shippingAddress.state || shippingAddress.zipCode) && (
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900">
                       {[shippingAddress.city, shippingAddress.state, shippingAddress.zipCode]
                         .filter(Boolean)
                         .join(', ')}
                     </p>
                   )}
-                  {shippingAddress.country && (
-                    <p className="text-gray-900 font-medium">{shippingAddress.country}</p>
-                  )}
                   {shippingAddress.notes && (
-                    <div className="mt-3 pt-3 border-t-2 border-gray-300">
-                      <p className="text-sm font-semibold text-gray-700">NOTAS IMPORTANTES:</p>
-                      <p className="text-gray-900 font-medium">{shippingAddress.notes}</p>
-                    </div>
+                    <p className="text-gray-900 font-semibold mt-1 print:mt-0">⚠️ {shippingAddress.notes}</p>
                   )}
                 </div>
               )
             ) : (
-              <p className="text-gray-600">No se especificó dirección de envío</p>
+              <p className="text-gray-600 print:text-[10px]">No se especificó dirección de envío</p>
             )}
           </div>
 
-          {/* Productos */}
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-gray-300 pb-2">
+          {/* Productos - Compacto */}
+          <div className="mb-4 print:mb-2">
+            <h2 className="text-lg font-bold text-gray-900 mb-2 border-b border-gray-300 pb-1 print:text-xs print:mb-1 print:pb-0.5">
               🛍️ PRODUCTOS A PREPARAR
             </h2>
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse print:text-[10px]">
               <thead>
                 <tr className="bg-gray-800 text-white">
-                  <th className="text-left p-3 font-semibold">CANT.</th>
-                  <th className="text-left p-3 font-semibold">PRODUCTO</th>
-                  <th className="text-right p-3 font-semibold">PRECIO UNIT.</th>
-                  <th className="text-right p-3 font-semibold">SUBTOTAL</th>
-                  <th className="text-center p-3 font-semibold w-20">✓</th>
+                  <th className="text-left p-2 font-semibold print:p-0.5 print:text-[9px]">CANT.</th>
+                  <th className="text-left p-2 font-semibold print:p-0.5 print:text-[9px]">PRODUCTO</th>
+                  <th className="text-right p-2 font-semibold print:p-0.5 print:text-[9px]">PRECIO UNIT.</th>
+                  <th className="text-right p-2 font-semibold print:p-0.5 print:text-[9px]">SUBTOTAL</th>
+                  <th className="text-center p-2 font-semibold w-12 print:p-0.5 print:w-6 print:text-[9px]">✓</th>
                 </tr>
               </thead>
               <tbody>
                 {order.items.map((item: any, index: number) => (
                   <tr key={item.id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                    <td className="p-3 border-b border-gray-300">
-                      <span className="text-2xl font-bold text-gray-900">{item.quantity}</span>
+                    <td className="p-2 border-b border-gray-300 print:p-0.5">
+                      <span className="text-xl font-bold text-gray-900 print:text-sm">{item.quantity}</span>
                     </td>
-                    <td className="p-3 border-b border-gray-300">
-                      <p className="font-medium text-gray-900">{item.product?.name || "Producto eliminado"}</p>
-                      {item.product?.sku && (
-                        <p className="text-sm text-gray-600">SKU: {item.product.sku}</p>
-                      )}
+                    <td className="p-2 border-b border-gray-300 print:p-0.5">
+                      <p className="font-medium text-gray-900 print:text-[10px] print:leading-tight">{item.product?.name || "Producto eliminado"}</p>
                     </td>
-                    <td className="p-3 border-b border-gray-300 text-right text-gray-900">
+                    <td className="p-2 border-b border-gray-300 text-right text-gray-900 print:p-0.5">
                       ${formatPrice(item.unitPrice)}
                     </td>
-                    <td className="p-3 border-b border-gray-300 text-right font-semibold text-gray-900">
+                    <td className="p-2 border-b border-gray-300 text-right font-semibold text-gray-900 print:p-0.5">
                       ${formatPrice(item.quantity * item.unitPrice)}
                     </td>
-                    <td className="p-3 border-b border-gray-300 text-center">
-                      <div className="w-8 h-8 border-2 border-gray-400 rounded mx-auto"></div>
+                    <td className="p-2 border-b border-gray-300 text-center print:p-0.5">
+                      <div className="w-6 h-6 border-2 border-gray-400 rounded mx-auto print:w-3 print:h-3 print:border"></div>
                     </td>
                   </tr>
                 ))}
@@ -278,9 +252,9 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
             </table>
           </div>
 
-          {/* Totales */}
-          <div className="mb-6">
-            <div className="max-w-md ml-auto space-y-2">
+          {/* Totales - Compacto */}
+          <div className="mb-4 print:mb-2">
+            <div className="max-w-md ml-auto space-y-1 print:space-y-0 print:text-[10px]">
               <div className="flex justify-between text-gray-900">
                 <span>Subtotal:</span>
                 <span className="font-semibold">${formatPrice(order.subtotal)}</span>
@@ -297,56 +271,40 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
                   <span className="font-semibold">-${formatPrice(order.discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-2xl font-bold text-gray-900 pt-2 border-t-2 border-gray-800">
+              <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t-2 border-gray-800 print:text-sm print:pt-0.5 print:border-t">
                 <span>TOTAL:</span>
                 <span>${formatPrice(order.totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          {/* Footer con información de pago */}
-          <div className="mt-8 pt-6 border-t-2 border-gray-300">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+          {/* Footer - Muy compacto */}
+          <div className="mt-4 pt-2 border-t border-gray-300 print:mt-2 print:pt-1">
+            <div className="flex justify-between text-sm print:text-[9px]">
               <div>
-                <p className="text-gray-600">Método de Pago</p>
-                <p className="font-semibold text-gray-900">Mercado Pago</p>
-                {order.mpPaymentId && (
-                  <p className="text-xs text-gray-600 font-mono mt-1">ID: {order.mpPaymentId}</p>
-                )}
+                <span className="text-gray-600">Método: </span>
+                <span className="font-semibold text-gray-900">Mercado Pago</span>
               </div>
-              <div className="text-right">
-                <p className="text-gray-600">Moneda</p>
-                <p className="font-semibold text-gray-900">{order.currency}</p>
+              <div>
+                <span className="text-gray-600">Moneda: </span>
+                <span className="font-semibold text-gray-900">{order.currency}</span>
               </div>
             </div>
           </div>
 
-          {/* Notas adicionales */}
-          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-            <p className="text-sm font-semibold text-gray-700">NOTAS INTERNAS:</p>
-            <div className="mt-2 space-y-1">
-              <p className="text-sm text-gray-600">□ Productos verificados</p>
-              <p className="text-sm text-gray-600">□ Empaquetado completo</p>
-              <p className="text-sm text-gray-600">□ Etiqueta de envío adherida</p>
-              <p className="text-sm text-gray-600">□ Listo para despacho</p>
-            </div>
+          {/* Notas - Compacto */}
+          <div className="mt-4 p-2 bg-gray-100 rounded print:mt-2 print:p-1 print:text-[9px]">
+            <p className="text-sm font-semibold text-gray-700 print:text-[9px]">NOTAS:</p>
+            <p className="text-sm text-gray-600 print:text-[8px] print:leading-tight">□ Productos verificados □ Empaquetado □ Etiqueta adherida □ Listo</p>
           </div>
 
-          {/* Firma */}
-          <div className="mt-8 pt-6 border-t border-gray-300">
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <p className="text-sm text-gray-600 mb-8">Preparado por:</p>
-                <div className="border-t border-gray-400 pt-2">
-                  <p className="text-sm text-gray-600">Firma y Aclaración</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-8">Fecha:</p>
-                <div className="border-t border-gray-400 pt-2">
-                  <p className="text-sm text-gray-600">____ / ____ / ________</p>
-                </div>
-              </div>
+          {/* Firma - Compacto */}
+          <div className="mt-4 pt-2 border-t border-gray-300 grid grid-cols-2 gap-4 print:mt-2 print:pt-1 print:gap-2 print:text-[9px]">
+            <div>
+              <p className="text-sm text-gray-600 print:text-[8px]">Preparado por: _________________</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 print:text-[8px]">Fecha: ____ / ____ / ____</p>
             </div>
           </div>
         </div>
