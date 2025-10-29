@@ -112,23 +112,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
   // };
 
   return (
-    <>
-      <style jsx global>{`
-        @media print {
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
-          .no-print {
-            display: none !important;
-          }
-          @page {
-            margin: 1cm;
-          }
-        }
-      `}</style>
-
-      <div className="min-h-screen bg-white p-8 print:p-0">
+    <div className="min-h-screen bg-white p-8 print:p-0">
         {/* Botón Imprimir - Solo visible en pantalla */}
         <div className="no-print mb-6 flex justify-between items-center">
           <button
@@ -371,6 +355,5 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           </div>
         </div>
       </div>
-    </>
   );
 }
