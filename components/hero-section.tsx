@@ -4,12 +4,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/50 py-20 md:py-32">
       <div className="container">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -26,12 +27,14 @@ export function HeroSection() {
               La mejor ropa para niños y niñas. Calidad, comodidad y diseños únicos. Envíos a todo el país con pago seguro por Mercado Pago.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
+              {/* @ts-ignore */}
               <Button asChild size="lg">
                 <Link href="/productos">
                   Ver productos
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
+              {/* @ts-ignore */}
               <Button asChild size="lg" variant="outline">
                 <Link href="/productos?featured=true">
                   Destacados
@@ -44,13 +47,17 @@ export function HeroSection() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="relative hidden lg:block"
+            className="relative"
           >
-            <div className="aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 to-blue-600/20">
-              {/* Placeholder para imagen hero */}
-              <div className="flex h-full items-center justify-center">
-                <p className="text-6xl">🛍️</p>
-              </div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
+              <Image
+                src="/kids-hero.jpg"
+                alt="Niños con ropa Woky Kids"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
             </div>
           </motion.div>
         </div>
