@@ -33,7 +33,7 @@ export default async function AdminLayout({
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg">
+      <aside className="no-print w-64 bg-white dark:bg-gray-800 shadow-lg">
         <div className="p-4 border-b dark:border-gray-700">
           <Link href="/admin" className="flex items-center space-x-2">
             <Package className="h-8 w-8 text-blue-600" />

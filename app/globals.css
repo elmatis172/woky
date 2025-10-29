@@ -71,10 +71,39 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  .no-print {
+  
+  /* Ocultar elementos que no deben imprimirse */
+  .no-print,
+  nav,
+  header,
+  aside,
+  footer,
+  [role="navigation"],
+  [role="banner"],
+  [role="complementary"] {
     display: none !important;
   }
+  
+  /* Asegurar que solo se imprima el contenido principal */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  
   @page {
     margin: 1cm;
+    size: A4;
+  }
+  
+  /* Evitar saltos de página en elementos importantes */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  
+  /* Forzar colores en impresión */
+  * {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
