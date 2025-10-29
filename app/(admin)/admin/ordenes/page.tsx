@@ -3,6 +3,15 @@ import Link from "next/link";
 import { Package } from "lucide-react";
 import { OrderActions } from "@/components/admin/order-actions";
 
+// Función helper para formatear precios de forma segura
+function formatPrice(amount: number): string {
+  try {
+    return new Intl.NumberFormat('es-AR').format(amount);
+  } catch {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+}
+
 export default async function OrdersAdminPage() {
   const orders = await db.order.findMany({
     include: {
@@ -116,7 +125,7 @@ export default async function OrdersAdminPage() {
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                    ${order.totalAmount.toLocaleString("es-AR")}
+                    ${formatPrice(order.totalAmount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
