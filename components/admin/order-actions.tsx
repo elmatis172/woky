@@ -56,10 +56,12 @@ export function OrderActions({ orderId }: OrderActionsProps) {
         <Printer className="h-4 w-4" />
       </Link>
       <button
+        type="button"
         onClick={handleDelete}
         disabled={isDeleting}
         className="inline-flex items-center p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Eliminar orden"
+        aria-label="Eliminar orden"
       >
         <Trash2 className="h-4 w-4" />
       </button>
