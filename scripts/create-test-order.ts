@@ -64,6 +64,7 @@ async function main() {
         create: [
           {
             productId: product.id,
+            name: product.name,
             quantity: 2,
             unitPrice: product.price,
           },
