@@ -60,6 +60,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       discount: true,
       totalAmount: true,
       mpPaymentId: true,
+      mpPreferenceId: true,
       createdAt: true,
       updatedAt: true,
       shippingAddress: true,
