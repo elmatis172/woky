@@ -8,7 +8,7 @@ async function main() {
   // Buscar un producto existente
   const product = await prisma.product.findFirst({
     where: {
-      status: "ACTIVE",
+      status: "PUBLISHED",
     },
   });
 
