@@ -24,8 +24,17 @@ export default async function AdminDashboard() {
     db.order.findMany({
       take: 5,
       orderBy: { createdAt: "desc" },
-      include: {
-        user: true,
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        totalAmount: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
       },
     }),
   ]);
@@ -34,6 +43,9 @@ export default async function AdminDashboard() {
   const allOrders = await db.order.findMany({
     where: {
       status: "PAID",
+    },
+    select: {
+      totalAmount: true,
     },
   });
   
