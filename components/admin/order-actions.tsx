@@ -2,19 +2,12 @@
 
 import { Eye, Printer } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface OrderActionsProps {
   orderId: string;
 }
 
 export function OrderActions({ orderId }: OrderActionsProps) {
-  const router = useRouter();
-
-  const handlePrint = () => {
-    router.push(`/admin/ordenes/${orderId}/print`);
-  };
-
   return (
     <div className="flex items-center gap-2">
       <Link
@@ -24,13 +17,14 @@ export function OrderActions({ orderId }: OrderActionsProps) {
       >
         <Eye className="h-4 w-4" />
       </Link>
-      <button
-        onClick={handlePrint}
+      <Link
+        href={`/admin/ordenes/${orderId}/print`}
+        target="_blank"
         className="inline-flex items-center p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
         title="Imprimir orden"
       >
         <Printer className="h-4 w-4" />
-      </button>
+      </Link>
     </div>
   );
 }
