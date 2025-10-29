@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { ArrowLeft, Package, User, CreditCard, MapPin } from "lucide-react";
-import { ShippingStatusUpdater } from "@/components/admin/shipping-status-updater";
+// import { ShippingStatusUpdater } from "@/components/admin/shipping-status-updater"; // Deshabilitado temporalmente
 
 // Funciones helper fuera del componente
 function formatPrice(amount: number): string {
@@ -270,13 +270,13 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             </div>
           </div>
 
-          {/* Actualizador de Estado de Envío */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          {/* Actualizador de Estado de Envío - DESHABILITADO TEMPORALMENTE */}
+          {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <ShippingStatusUpdater
               orderId={order.id}
               currentStatus={order.shippingStatus || "PENDING"}
             />
-          </div>
+          </div> */}
 
           {shippingAddress && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">

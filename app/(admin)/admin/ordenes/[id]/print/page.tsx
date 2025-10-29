@@ -103,13 +103,13 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
     CANCELLED: "Cancelada",
   };
 
-  const shippingStatusLabels: Record<string, string> = {
-    PENDING: "Pendiente",
-    PROCESSING: "Procesando",
-    SHIPPED: "Despachado",
-    DELIVERED: "Entregado",
-    CANCELLED: "Cancelado",
-  };
+  // const shippingStatusLabels: Record<string, string> = {
+  //   PENDING: "Pendiente",
+  //   PROCESSING: "Procesando",
+  //   SHIPPED: "Despachado",
+  //   DELIVERED: "Entregado",
+  //   CANCELLED: "Cancelado",
+  // };
 
   return (
     <>
@@ -163,15 +163,16 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
           </div>
 
           {/* Estados */}
-          <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="text-sm text-gray-600 font-medium">Estado de Pago</p>
               <p className="text-lg font-bold text-gray-900">{statusLabels[order.status]}</p>
             </div>
-            <div>
+            {/* Estado de envío deshabilitado temporalmente */}
+            {/* <div>
               <p className="text-sm text-gray-600 font-medium">Estado de Envío</p>
               <p className="text-lg font-bold text-gray-900">{shippingStatusLabels[order.shippingStatus || "PENDING"]}</p>
-            </div>
+            </div> */}
           </div>
 
           {/* Información del Cliente */}

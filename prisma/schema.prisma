@@ -29,13 +29,13 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum ShippingStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-}
+// enum ShippingStatus {
+//   PENDING
+//   PROCESSING
+//   SHIPPED
+//   DELIVERED
+//   CANCELLED
+// }
 
 model Account {
   id                String  @id @default(cuid())
@@ -145,7 +145,7 @@ model Order {
   user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   email           String
   status          OrderStatus    @default(PENDING)
-  shippingStatus  ShippingStatus @default(PENDING)
+  // shippingStatus  ShippingStatus @default(PENDING)  // Comentado temporalmente - columna no existe en DB
   currency        String         @default("ARS")
   subtotal        Int            // En centavos
   shipping        Int            @default(0)
@@ -164,7 +164,7 @@ model Order {
   @@index([userId])
   @@index([email])
   @@index([status])
-  @@index([shippingStatus])
+  // @@index([shippingStatus])  // Comentado temporalmente
   @@index([mpPaymentId])
 }
 
