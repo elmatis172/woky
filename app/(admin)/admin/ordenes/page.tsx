@@ -13,7 +13,7 @@ function formatPrice(amount: number): string {
 }
 
 export default async function OrdersAdminPage() {
-  let orders;
+  let orders: any[] = [];
   try {
     orders = await db.order.findMany({
       select: {
