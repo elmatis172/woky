@@ -90,8 +90,19 @@ export async function POST(req: NextRequest) {
           create: orderItems,
         },
       },
-      include: {
-        items: true,
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        totalAmount: true,
+        items: {
+          select: {
+            id: true,
+            name: true,
+            quantity: true,
+            unitPrice: true,
+          },
+        },
       },
     });
 
@@ -116,6 +127,9 @@ export async function POST(req: NextRequest) {
     await db.order.update({
       where: { id: order.id },
       data: { mpPreferenceId: preference.id },
+      select: {
+        id: true,
+      },
     });
 
     return NextResponse.json({

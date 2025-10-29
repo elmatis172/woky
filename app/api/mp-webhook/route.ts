@@ -133,6 +133,10 @@ export async function POST(req: NextRequest) {
         mpPaymentId: payment.id?.toString(),
         timeline: JSON.stringify(updatedTimeline),
       },
+      select: {
+        id: true,
+        status: true,
+      },
     });
 
     // Si el pago fue aprobado, decrementar stock

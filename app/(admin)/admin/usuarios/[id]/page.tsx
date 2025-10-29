@@ -21,12 +21,28 @@ export default async function UserDetailPage({ params }: UserDetailPageProps) {
 
   const user = await db.user.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      emailVerified: true,
+      image: true,
+      role: true,
+      blocked: true,
+      createdAt: true,
+      updatedAt: true,
       orders: {
         orderBy: {
           createdAt: "desc",
         },
         take: 10,
+        select: {
+          id: true,
+          email: true,
+          status: true,
+          totalAmount: true,
+          createdAt: true,
+        },
       },
       _count: {
         select: {
