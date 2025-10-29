@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Package } from "lucide-react";
-import { OrderActions } from "@/components/admin/order-actions";
+import { OrderActionsWithDelete } from "@/components/admin/order-actions-with-delete";
 
 // Función helper para formatear precios de forma segura
 function formatPrice(amount: number): string {
@@ -136,7 +136,7 @@ export default async function OrdersAdminPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <OrderActions orderId={order.id} />
+                      <OrderActionsWithDelete orderId={order.id} />
                     </td>
                   </tr>
                 );
