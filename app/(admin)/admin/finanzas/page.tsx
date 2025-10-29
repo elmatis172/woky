@@ -209,6 +209,9 @@ export default async function FinanzasPage() {
                   Estado
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Medio de Pago
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Subtotal
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -228,7 +231,7 @@ export default async function FinanzasPage() {
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan={10} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No hay órdenes registradas
                   </td>
                 </tr>
@@ -257,6 +260,11 @@ export default async function FinanzasPage() {
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[order.status]}`}>
                         {statusLabels[order.status]}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center text-sm text-gray-900 dark:text-white">
+                        <span className="font-medium">Mercado Pago</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       {formatPrice(order.subtotal)}
