@@ -38,7 +38,11 @@ async function main() {
       userId: user.id,
       email: user.email || "test@test.com",
       status: "PAID",
-      totalAmount: product.price * 2, // Comprando 2 unidades
+      currency: "ARS",
+      subtotal: product.price * 2, // 2 unidades
+      shipping: 5000, // $50 de envío
+      discount: 0,
+      totalAmount: product.price * 2 + 5000,
       shippingAddress: JSON.stringify({
         street: "Av. Corrientes 1234",
         city: "Buenos Aires",
