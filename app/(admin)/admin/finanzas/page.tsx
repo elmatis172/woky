@@ -27,6 +27,20 @@ function formatDate(date: Date): string {
   }).format(date);
 }
 
+function parseShippingAddress(data: any): { state?: string; city?: string } {
+  if (!data) return {};
+  
+  try {
+    if (typeof data === 'string') {
+      const parsed = JSON.parse(data);
+      return { state: parsed.state, city: parsed.city };
+    }
+    return { state: data.state, city: data.city };
+  } catch {
+    return {};
+  }
+}
+
 export default async function FinanzasPage() {
   const session = await auth();
 
@@ -47,6 +61,7 @@ export default async function FinanzasPage() {
       createdAt: true,
       email: true,
       mpPaymentId: true,
+      shippingAddress: true,
       user: {
         select: {
           name: true,
@@ -203,6 +218,12 @@ export default async function FinanzasPage() {
                   Cliente
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Provincia
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Localidad
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Fecha
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -231,7 +252,7 @@ export default async function FinanzasPage() {
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <td colSpan={12} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No hay órdenes registradas
                   </td>
                 </tr>
@@ -249,6 +270,16 @@ export default async function FinanzasPage() {
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
                         {order.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {parseShippingAddress(order.shippingAddress).state || '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 dark:text-white">
+                        {parseShippingAddress(order.shippingAddress).city || '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

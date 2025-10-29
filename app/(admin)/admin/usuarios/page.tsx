@@ -2,6 +2,20 @@ import { db } from "@/lib/db";
 import { Shield, ShieldCheck } from "lucide-react";
 import { UserActions } from "@/components/admin/user-actions";
 
+function parseShippingAddress(data: any): { state?: string; city?: string } {
+  if (!data) return {};
+  
+  try {
+    if (typeof data === 'string') {
+      const parsed = JSON.parse(data);
+      return { state: parsed.state, city: parsed.city };
+    }
+    return { state: data.state, city: data.city };
+  } catch {
+    return {};
+  }
+}
+
 export default async function UsersAdminPage() {
   const users = await db.user.findMany({
     include: {
@@ -9,6 +23,15 @@ export default async function UsersAdminPage() {
         select: {
           orders: true,
         },
+      },
+      orders: {
+        select: {
+          shippingAddress: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 1,
       },
     },
     orderBy: {
@@ -45,6 +68,12 @@ export default async function UsersAdminPage() {
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Provincia
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Localidad
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Rol
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -76,6 +105,16 @@ export default async function UsersAdminPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     {user.email}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    {user.orders?.[0]?.shippingAddress 
+                      ? parseShippingAddress(user.orders[0].shippingAddress).state || '-'
+                      : '-'}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    {user.orders?.[0]?.shippingAddress 
+                      ? parseShippingAddress(user.orders[0].shippingAddress).city || '-'
+                      : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
