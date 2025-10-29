@@ -70,6 +70,8 @@
   body {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   /* Ocultar elementos que no deben imprimirse */
@@ -89,16 +91,27 @@
     margin: 0 !important;
     padding: 0 !important;
     max-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* Usar todo el ancho disponible */
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
   @page {
-    margin: 1cm;
-    size: A4;
+    margin: 0.5cm;
+    size: A4 portrait;
   }
   
   /* Evitar saltos de página en elementos importantes */
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
+  }
+  
+  table {
+    page-break-inside: avoid;
   }
   
   /* Forzar colores en impresión */

@@ -125,7 +125,7 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
         <PrintActions />
 
         {/* Contenido imprimible */}
-        <div className="max-w-4xl mx-auto bg-white">
+        <div className="max-w-5xl mx-auto bg-white print:max-w-full">
           {/* Header */}
           <div className="border-b-4 border-gray-800 pb-6 mb-6">
             <div className="flex justify-between items-start">
