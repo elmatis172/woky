@@ -13,14 +13,20 @@ function formatPrice(amount: number): string {
 }
 
 export default async function OrdersAdminPage() {
-  const orders = await db.order.findMany({
-    include: {
-      user: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  let orders;
+  try {
+    orders = await db.order.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    orders = [];
+  }
 
   const statusColors: Record<string, string> = {
     PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -100,56 +106,59 @@ export default async function OrdersAdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {orders.map((order: any) => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      #{order.id.slice(0, 8)}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
+              {orders.map((order: any) => {
+                const shippingStatus = (order.shippingStatus as string) || "PENDING";
+                return (
+                  <tr key={order.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {order.user?.name || "Usuario eliminado"}
+                        #{order.id.slice(0, 8)}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {order.user?.email || "N/A"}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(order.createdAt).toLocaleDateString("es-AR", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                    ${formatPrice(order.totalAmount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        statusColors[order.status]
-                      }`}
-                    >
-                      {statusLabels[order.status]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        shippingStatusColors[order.shippingStatus || "PENDING"]
-                      }`}
-                    >
-                      {shippingStatusLabels[order.shippingStatus || "PENDING"]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                    <OrderActions orderId={order.id} />
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {order.user?.name || "Usuario eliminado"}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {order.user?.email || "N/A"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(order.createdAt).toLocaleDateString("es-AR", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
+                      ${formatPrice(order.totalAmount)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          statusColors[order.status]
+                        }`}
+                      >
+                        {statusLabels[order.status]}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          shippingStatusColors[shippingStatus]
+                        }`}
+                      >
+                        {shippingStatusLabels[shippingStatus]}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                      <OrderActions orderId={order.id} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
