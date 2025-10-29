@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Edit, Trash2, FolderTree } from "lucide-react";
+import { Plus, FolderTree } from "lucide-react";
+import { CategoryActions } from "@/components/admin/category-actions";
 
 export default async function CategoriesAdminPage() {
   const categories = await db.category.findMany({
@@ -70,17 +71,11 @@ export default async function CategoriesAdminPage() {
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {category._count.products} productos
                 </span>
-                <div className="flex items-center space-x-2">
-                  <Link
-                    href={`/admin/categorias/${category.id}/editar`}
-                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Link>
-                  <button className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+                <CategoryActions
+                  categoryId={category.id}
+                  categoryName={category.name}
+                  productCount={category._count.products}
+                />
               </div>
             </div>
           </div>
