@@ -72,9 +72,13 @@ export default function CarritoPage() {
       });
 
       const data = await response.json();
-      if (data.init_point) {
+      console.log("MP Response:", data);
+      
+      if (data.initPoint) {
         // Redirigir a Mercado Pago
-        window.location.href = data.init_point;
+        window.location.href = data.initPoint;
+      } else {
+        console.error("No se recibió initPoint:", data);
       }
     } catch (error) {
       console.error("Error al crear orden:", error);
