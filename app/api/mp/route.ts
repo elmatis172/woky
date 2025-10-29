@@ -13,8 +13,24 @@ const createOrderSchema = z.object({
   email: z.string().email(),
   customerData: z
     .object({
-      name: z.string().optional(),
-      phone: z.string().optional(),
+      fullName: z.string(),
+      email: z.string().email(),
+      phone: z.string(),
+      shippingAddress: z.object({
+        street: z.string(),
+        number: z.string(),
+        floor: z.string().optional(),
+        city: z.string(),
+        province: z.string(),
+        postalCode: z.string().optional(),
+        country: z.string(),
+      }),
+      billingData: z.object({
+        invoiceType: z.string(),
+        taxId: z.string(),
+        businessName: z.string(),
+      }),
+      notes: z.string().optional(),
     })
     .optional(),
 });
@@ -98,6 +114,12 @@ export async function POST(req: NextRequest) {
         discount,
         totalAmount,
         customerData: JSON.stringify(customerData || {}),
+        shippingAddress: customerData?.shippingAddress 
+          ? JSON.stringify(customerData.shippingAddress) 
+          : null,
+        billingAddress: customerData?.billingData 
+          ? JSON.stringify(customerData.billingData) 
+          : null,
         timeline: JSON.stringify([
           {
             status: "PENDING",
@@ -142,7 +164,7 @@ export async function POST(req: NextRequest) {
       items: preferenceItems,
       payer: {
         email: email,
-        name: customerData?.name,
+        name: customerData?.fullName,
       },
     });
 

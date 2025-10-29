@@ -38,6 +38,11 @@ export default function CarritoPage() {
     postalCode: "",
     notes: "",
   });
+  const [billingData, setBillingData] = useState({
+    invoiceType: "CONSUMIDOR_FINAL", // CONSUMIDOR_FINAL, RESPONSABLE_INSCRIPTO, MONOTRIBUTISTA
+    taxId: "", // CUIT/CUIL/DNI
+    businessName: "", // Razón Social (solo para empresas)
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -75,7 +80,18 @@ export default function CarritoPage() {
     // Validar que todos los campos requeridos estén completos
     if (!shippingData.fullName || !shippingData.email || !shippingData.phone || 
         !shippingData.street || !shippingData.city || !shippingData.province) {
-      alert("Por favor completá todos los campos requeridos");
+      alert("Por favor completá todos los campos de envío requeridos");
+      return;
+    }
+
+    // Validar datos de facturación
+    if (!billingData.taxId) {
+      alert("Por favor completá el CUIT/CUIL/DNI para la facturación");
+      return;
+    }
+
+    if (billingData.invoiceType !== "CONSUMIDOR_FINAL" && !billingData.businessName) {
+      alert("Por favor completá la Razón Social");
       return;
     }
 
@@ -102,6 +118,11 @@ export default function CarritoPage() {
               province: shippingData.province,
               postalCode: shippingData.postalCode,
               country: "Argentina",
+            },
+            billingData: {
+              invoiceType: billingData.invoiceType,
+              taxId: billingData.taxId,
+              businessName: billingData.businessName || shippingData.fullName,
             },
             notes: shippingData.notes,
           },
@@ -392,6 +413,54 @@ export default function CarritoPage() {
                     onChange={(e) => setShippingData({...shippingData, notes: e.target.value})}
                     placeholder="Instrucciones de entrega..."
                   />
+                </div>
+
+                <Separator />
+
+                {/* Datos de Facturación */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Datos de Facturación</h3>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="invoiceType">Tipo de Factura *</Label>
+                    <select
+                      id="invoiceType"
+                      value={billingData.invoiceType}
+                      onChange={(e) => setBillingData({...billingData, invoiceType: e.target.value})}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      required
+                    >
+                      <option value="CONSUMIDOR_FINAL">Consumidor Final</option>
+                      <option value="RESPONSABLE_INSCRIPTO">Responsable Inscripto</option>
+                      <option value="MONOTRIBUTISTA">Monotributista</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="taxId">
+                      {billingData.invoiceType === "CONSUMIDOR_FINAL" ? "DNI *" : "CUIT/CUIL *"}
+                    </Label>
+                    <Input
+                      id="taxId"
+                      value={billingData.taxId}
+                      onChange={(e) => setBillingData({...billingData, taxId: e.target.value})}
+                      placeholder={billingData.invoiceType === "CONSUMIDOR_FINAL" ? "12345678" : "20-12345678-9"}
+                      required
+                    />
+                  </div>
+
+                  {billingData.invoiceType !== "CONSUMIDOR_FINAL" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="businessName">Razón Social *</Label>
+                      <Input
+                        id="businessName"
+                        value={billingData.businessName}
+                        onChange={(e) => setBillingData({...billingData, businessName: e.target.value})}
+                        placeholder="Nombre de la empresa"
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
