@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { orderId: string } }
+  context: { params: Promise<{ orderId: string }> }
 ) {
   try {
     // Verificar autenticación
@@ -17,7 +17,7 @@ export async function DELETE(
       );
     }
 
-    const { orderId } = params;
+    const { orderId } = await context.params;
 
     // Verificar que la orden existe
     const order = await db.order.findUnique({
