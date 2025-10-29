@@ -54,6 +54,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       userId: true,
       email: true,
       status: true,
+      currency: true,
       totalAmount: true,
       createdAt: true,
       updatedAt: true,
