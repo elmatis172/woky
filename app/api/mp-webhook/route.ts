@@ -60,6 +60,13 @@ export async function POST(req: NextRequest) {
     // Buscar la orden
     const order = await db.order.findUnique({
       where: { id: orderId },
+      select: {
+        id: true,
+        status: true,
+        userId: true,
+        email: true,
+        totalAmount: true,
+      },
     });
 
     if (!order) {

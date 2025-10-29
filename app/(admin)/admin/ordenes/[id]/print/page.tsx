@@ -52,11 +52,37 @@ export default async function PrintOrderPage({ params }: PrintOrderPageProps) {
 
   const order = await db.order.findUnique({
     where: { id },
-    include: {
-      user: true,
+    select: {
+      id: true,
+      userId: true,
+      email: true,
+      status: true,
+      totalAmount: true,
+      createdAt: true,
+      shippingAddress: true,
+      billingAddress: true,
+      customerData: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       items: {
-        include: {
-          product: true,
+        select: {
+          id: true,
+          quantity: true,
+          price: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              images: true,
+              description: true,
+              price: true,
+            },
+          },
         },
       },
     },

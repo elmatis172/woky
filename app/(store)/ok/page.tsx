@@ -16,10 +16,28 @@ export default async function OkPage({
 
   const order = await db.order.findUnique({
     where: { id: orderId },
-    include: {
+    select: {
+      id: true,
+      userId: true,
+      email: true,
+      status: true,
+      totalAmount: true,
+      createdAt: true,
+      shippingAddress: true,
+      billingAddress: true,
+      customerData: true,
       items: {
-        include: {
-          product: true,
+        select: {
+          id: true,
+          quantity: true,
+          price: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              images: true,
+            },
+          },
         },
       },
     },
