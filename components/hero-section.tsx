@@ -51,7 +51,7 @@ export function HeroSection() {
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl shadow-2xl">
               <Image
-                src="/kids-hero.jpg"
+                src="/kids-hero.png"
                 alt="Niños con ropa Woky Kids"
                 fill
                 className="object-cover"
