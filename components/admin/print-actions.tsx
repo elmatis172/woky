@@ -8,7 +8,7 @@ export function PrintActions() {
   return (
     <div className="no-print mb-6 flex justify-between items-center">
       <button
-        onClick={() => router.back()}
+        onClick={() => router.push('/admin/ordenes')}
         className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
       >
         ← Volver
