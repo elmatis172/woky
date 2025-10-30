@@ -9,8 +9,14 @@ interface AddToCartButtonProps {
   product: {
     id: string;
     name: string;
+    slug: string;
     price: number;
     stock: number;
+    images: any; // Puede ser string o array
+    weight?: number | null;
+    width?: number | null;
+    height?: number | null;
+    length?: number | null;
   };
   disabled?: boolean;
 }
@@ -18,6 +24,21 @@ interface AddToCartButtonProps {
 export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  
+  // Parsear imágenes
+  const parseImages = (images: any): string[] => {
+    if (!images) return ["/placeholder.png"];
+    if (Array.isArray(images)) return images;
+    if (typeof images === "string") {
+      try {
+        const parsed = JSON.parse(images);
+        return Array.isArray(parsed) ? parsed : ["/placeholder.png"];
+      } catch {
+        return ["/placeholder.png"];
+      }
+    }
+    return ["/placeholder.png"];
+  };
 
   const handleAddToCart = async () => {
     setIsAdding(true);
@@ -29,13 +50,32 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
       const existingItem = cart.find((item: any) => item.id === product.id);
 
       if (existingItem) {
-        existingItem.quantity += quantity;
+        // Validar que no exceda el stock
+        const newQuantity = existingItem.quantity + quantity;
+        if (newQuantity > product.stock) {
+          toast({
+            title: "Stock insuficiente",
+            description: `Solo hay ${product.stock} unidades disponibles`,
+            variant: "destructive",
+          });
+          setIsAdding(false);
+          return;
+        }
+        existingItem.quantity = newQuantity;
       } else {
+        const images = parseImages(product.images);
         cart.push({
           id: product.id,
           name: product.name,
+          slug: product.slug,
           price: product.price,
+          image: images[0] || "/placeholder.png",
           quantity,
+          stock: product.stock,
+          weight: product.weight,
+          width: product.width,
+          height: product.height,
+          length: product.length,
         });
       }
 
@@ -45,6 +85,10 @@ export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
         title: "Agregado al carrito",
         description: `${quantity}x ${product.name}`,
       });
+      
+      // Disparar evento para actualizar el contador del carrito
+      window.dispatchEvent(new Event('cartUpdated'));
+      
     } catch (error) {
       toast({
         title: "Error",
