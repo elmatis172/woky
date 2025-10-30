@@ -14,6 +14,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:shipping": "tsx prisma/seed-shipping.ts",
+    "db:seed:test": "tsx prisma/seed-test-product.ts",
     "db:studio": "prisma studio",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
