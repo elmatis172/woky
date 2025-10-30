@@ -9,7 +9,8 @@ import {
   ShoppingCart, 
   Users,
   LogOut,
-  DollarSign
+  DollarSign,
+  Truck
 } from "lucide-react";
 
 export default async function AdminLayout({
@@ -29,6 +30,7 @@ export default async function AdminLayout({
     { href: "/admin/productos", icon: Package, label: "Productos" },
     { href: "/admin/categorias", icon: FolderTree, label: "Categorías" },
     { href: "/admin/ordenes", icon: ShoppingCart, label: "Órdenes" },
+    { href: "/admin/envios", icon: Truck, label: "Envíos" },
     { href: "/admin/finanzas", icon: DollarSign, label: "Finanzas" },
     { href: "/admin/usuarios", icon: Users, label: "Usuarios" },
   ];
