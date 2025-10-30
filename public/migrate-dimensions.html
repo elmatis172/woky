@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrar Dimensiones de Productos</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .step {
+            background: #e7f3ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Migración de Base de Datos</h1>
+        <p>Esta herramienta agrega los campos de dimensiones (peso, ancho, alto, largo) a la tabla de productos para que Mercado Envíos funcione correctamente.</p>
+
+        <div class="warning">
+            <strong>⚠️ Importante:</strong> Esta migración es segura y puede ejecutarse múltiples veces sin problemas.
+        </div>
+
+        <div class="step">
+            <h3>Paso 1: Verificar Estado Actual</h3>
+            <p>Primero verificá si los campos ya existen en la base de datos.</p>
+            <button onclick="checkStatus()">🔍 Verificar Estado</button>
+            <div id="check-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Paso 2: Ejecutar Migración</h3>
+            <p>Si faltan campos, ejecutá la migración para agregarlos.</p>
+            <button onclick="runMigration()">▶️ Ejecutar Migración</button>
+            <div id="migration-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>Paso 3: Actualizar Productos</h3>
+            <p>Después de la migración, andá al admin y agregá las dimensiones a tus productos.</p>
+            <button onclick="window.open('/admin/productos', '_blank')" class="btn-secondary">📦 Ir a Productos</button>
+        </div>
+    </div>
+
+    <script>
+        async function checkStatus() {
+            const resultDiv = document.getElementById('check-result');
+            resultDiv.innerHTML = '<p>⏳ Verificando...</p>';
+
+            try {
+                const response = await fetch('/api/admin/migrate-dimensions', {
+                    method: 'GET',
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'ok') {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>${data.message}</strong>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <p>✅ La base de datos está lista. Ahora podés agregar dimensiones a tus productos.</p>
+                        </div>
+                    `;
+                } else if (data.status === 'incomplete') {
+                    resultDiv.innerHTML = `
+                        <div class="warning">
+                            <strong>${data.message}</strong>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <p>⚠️ Necesitás ejecutar la migración (Paso 2).</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Error:</strong> ${data.message}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error de red:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function runMigration() {
+            if (!confirm('¿Estás seguro de que querés ejecutar la migración?')) {
+                return;
+            }
+
+            const resultDiv = document.getElementById('migration-result');
+            resultDiv.innerHTML = '<p>⏳ Ejecutando migración...</p>';
+
+            try {
+                const response = await fetch('/api/admin/migrate-dimensions', {
+                    method: 'POST',
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>${data.message}</strong>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <p>✅ ¡Listo! Ahora podés agregar dimensiones a tus productos y Mercado Envíos funcionará.</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Error:</strong> ${data.message}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error de red:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
