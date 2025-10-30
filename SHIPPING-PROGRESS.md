@@ -49,7 +49,35 @@ Agregar campos de peso y dimensiones al formulario de productos para que Mercado
 - ✅ Actualizada API PUT /api/admin/products/[id]
 
 ### 2.2 Commiteando cambios
-- 🔄 Preparando commit...
+- ✅ Commit: 2c3dcce - "feat: Add product dimensions for Mercado Envíos shipping calculation"
+- ✅ Push completado
+
+**Commit:** 2c3dcce
+
+---
+
+## 🔄 FASE 3: Modificar Checkout (EN PROGRESO)
+
+### Objetivo
+Permitir que el cliente seleccione método de envío y ver el costo total.
+
+### 3.1 Analizando checkout actual
+- ✅ Encontrada página: app/(store)/carrito/page.tsx
+- ✅ Ya tiene formulario de envío y facturación
+- ✅ Calcula envío fijo: $50 si total < $500, gratis si > $500
+- ✅ Agregada selección de método de envío dinámico
+
+### 3.2 Implementación Checkout
+- ✅ Agregado estado para shippingOptions y selectedShipping
+- ✅ Función calculateShipping() para llamar al API
+- ✅ useEffect para recalcular al cambiar provincia/CP
+- ✅ UI para mostrar opciones de envío (locales + Mercado Envíos)
+- ✅ Radio buttons para seleccionar método
+- ✅ Auto-selección del más barato
+- ✅ Cálculo correcto del total (subtotal + shipping)
+- ✅ Validación de método seleccionado antes de checkout
+- ✅ Envío de shippingMethodId y shippingCost al API /api/mp
+- 🔄 Commiteando cambios...
 
 ---
 

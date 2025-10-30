@@ -20,12 +20,29 @@ interface CartItem {
   image: string;
   quantity: number;
   stock: number;
+  weight?: number | null;
+  width?: number | null;
+  height?: number | null;
+  length?: number | null;
+}
+
+interface ShippingOption {
+  id: string;
+  name: string;
+  type: string;
+  cost: number;
+  estimatedDays: string | null;
+  isMercadoEnvios: boolean;
+  mercadoEnviosId?: number;
 }
 
 export default function CarritoPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [loadingShipping, setLoadingShipping] = useState(false);
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
   const [shippingData, setShippingData] = useState({
     fullName: "",
     email: "",
@@ -72,15 +89,74 @@ export default function CarritoPage() {
     updateCart(updatedCart);
   };
 
+  // Calcular opciones de envío cuando tenemos provincia y código postal
+  const calculateShipping = async () => {
+    if (!shippingData.province || !shippingData.postalCode) {
+      return;
+    }
+
+    setLoadingShipping(true);
+    try {
+      const response = await fetch("/api/shipping/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          zipCode: shippingData.postalCode,
+          province: shippingData.province,
+          items: cart.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            weight: item.weight,
+            width: item.width,
+            height: item.height,
+            length: item.length,
+          })),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const allOptions = data.all || [];
+        setShippingOptions(allOptions);
+        
+        // Auto-seleccionar el más barato si hay opciones
+        if (allOptions.length > 0) {
+          const cheapest = allOptions.reduce((min: ShippingOption, opt: ShippingOption) => 
+            opt.cost < min.cost ? opt : min
+          );
+          setSelectedShipping(cheapest);
+        }
+      }
+    } catch (error) {
+      console.error("Error calculando envío:", error);
+    } finally {
+      setLoadingShipping(false);
+    }
+  };
+
+  // Recalcular envío cuando cambia provincia o código postal
+  useEffect(() => {
+    if (shippingData.province && shippingData.postalCode && cart.length > 0) {
+      calculateShipping();
+    }
+  }, [shippingData.province, shippingData.postalCode]);
+
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 50000 ? 0 : 5000; // Envío gratis en compras mayores a $500
+  const shipping = selectedShipping ? selectedShipping.cost : 0;
   const total = subtotal + shipping;
 
   const handleCheckout = async () => {
     // Validar que todos los campos requeridos estén completos
     if (!shippingData.fullName || !shippingData.email || !shippingData.phone || 
-        !shippingData.street || !shippingData.city || !shippingData.province) {
+        !shippingData.street || !shippingData.city || !shippingData.province || !shippingData.postalCode) {
       alert("Por favor completá todos los campos de envío requeridos");
+      return;
+    }
+
+    // Validar que se haya seleccionado un método de envío
+    if (!selectedShipping) {
+      alert("Por favor seleccioná un método de envío");
       return;
     }
 
@@ -106,6 +182,8 @@ export default function CarritoPage() {
             quantity: item.quantity,
           })),
           email: shippingData.email,
+          shippingMethodId: selectedShipping.id,
+          shippingCost: selectedShipping.cost,
           customerData: {
             fullName: shippingData.fullName,
             email: shippingData.email,
@@ -396,14 +474,76 @@ export default function CarritoPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode">Código Postal</Label>
+                  <Label htmlFor="postalCode">Código Postal *</Label>
                   <Input
                     id="postalCode"
                     value={shippingData.postalCode}
                     onChange={(e) => setShippingData({...shippingData, postalCode: e.target.value})}
                     placeholder="C1043"
+                    required
                   />
                 </div>
+
+                {/* Métodos de Envío */}
+                {shippingData.province && shippingData.postalCode && (
+                  <div className="space-y-3">
+                    <Label>Método de Envío *</Label>
+                    
+                    {loadingShipping && (
+                      <div className="text-sm text-muted-foreground">
+                        Calculando opciones de envío...
+                      </div>
+                    )}
+
+                    {!loadingShipping && shippingOptions.length === 0 && (
+                      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+                        No hay métodos de envío disponibles para tu zona. Por favor contactanos.
+                      </div>
+                    )}
+
+                    {!loadingShipping && shippingOptions.length > 0 && (
+                      <div className="space-y-2">
+                        {shippingOptions.map((option) => (
+                          <label
+                            key={option.id}
+                            className={`flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors ${
+                              selectedShipping?.id === option.id
+                                ? "border-primary bg-primary/5"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="radio"
+                                name="shipping"
+                                value={option.id}
+                                checked={selectedShipping?.id === option.id}
+                                onChange={() => setSelectedShipping(option)}
+                                className="h-4 w-4"
+                              />
+                              <div>
+                                <p className="font-medium">{option.name}</p>
+                                {option.estimatedDays && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {option.estimatedDays}
+                                  </p>
+                                )}
+                                {option.isMercadoEnvios && (
+                                  <p className="text-xs text-blue-600">
+                                    📦 Mercado Envíos
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <p className="font-semibold">
+                              {option.cost === 0 ? "GRATIS" : formatPrice(option.cost)}
+                            </p>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="notes">Notas (opcional)</Label>
