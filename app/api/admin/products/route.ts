@@ -57,6 +57,10 @@ export async function POST(request: NextRequest) {
       categoryId,
       status,
       featured,
+      weight,
+      width,
+      height,
+      length,
     } = body;
 
     // Validaciones básicas
@@ -93,6 +97,10 @@ export async function POST(request: NextRequest) {
         categoryId: categoryId || null,
         status: status || "DRAFT",
         featured: featured || false,
+        weight: weight ? Number(weight) : null,
+        width: width ? Number(width) : null,
+        height: height ? Number(height) : null,
+        length: length ? Number(length) : null,
       },
       include: {
         category: true,

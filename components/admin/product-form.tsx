@@ -22,6 +22,11 @@ interface ProductFormData {
   tags: string[];
   seoTitle: string | null;
   seoDescription: string | null;
+  // Campos para Mercado Envíos
+  weight: number | null;
+  width: number | null;
+  height: number | null;
+  length: number | null;
 }
 
 interface ProductFormProps {
@@ -64,6 +69,11 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     tags: product?.tags || [],
     seoTitle: product?.seoTitle || null,
     seoDescription: product?.seoDescription || null,
+    // Campos para Mercado Envíos
+    weight: product?.weight || null,
+    width: product?.width || null,
+    height: product?.height || null,
+    length: product?.length || null,
   });
 
   const [imageUrl, setImageUrl] = useState("");
@@ -324,6 +334,80 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
             />
           </div>
         </div>
+      </div>
+
+      {/* Dimensiones y Peso para Mercado Envíos */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-xl font-semibold mb-4">📦 Dimensiones y Peso</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Necesario para calcular costos de envío con Mercado Envíos. Si no completás estos datos, 
+          solo estarán disponibles los métodos de envío locales.
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="weight">Peso (gramos)</Label>
+            <Input
+              id="weight"
+              type="number"
+              value={formData.weight || ""}
+              onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              placeholder="Ej: 250"
+            />
+            <p className="text-xs text-gray-500 mt-1">Peso del producto en gramos</p>
+          </div>
+
+          <div>
+            <Label htmlFor="width">Ancho (cm)</Label>
+            <Input
+              id="width"
+              type="number"
+              value={formData.width || ""}
+              onChange={(e) => setFormData({ ...formData, width: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              step="0.1"
+              placeholder="Ej: 25"
+            />
+            <p className="text-xs text-gray-500 mt-1">Ancho del paquete</p>
+          </div>
+
+          <div>
+            <Label htmlFor="height">Alto (cm)</Label>
+            <Input
+              id="height"
+              type="number"
+              value={formData.height || ""}
+              onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              step="0.1"
+              placeholder="Ej: 5"
+            />
+            <p className="text-xs text-gray-500 mt-1">Alto del paquete</p>
+          </div>
+
+          <div>
+            <Label htmlFor="length">Largo (cm)</Label>
+            <Input
+              id="length"
+              type="number"
+              value={formData.length || ""}
+              onChange={(e) => setFormData({ ...formData, length: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              step="0.1"
+              placeholder="Ej: 30"
+            />
+            <p className="text-xs text-gray-500 mt-1">Largo del paquete</p>
+          </div>
+        </div>
+
+        {formData.weight && formData.width && formData.height && formData.length && (
+          <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <p className="text-sm text-green-700 dark:text-green-400">
+              ✓ Dimensiones completas: Este producto podrá usar Mercado Envíos
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Imágenes */}

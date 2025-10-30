@@ -58,6 +58,10 @@ export async function PUT(
       categoryId,
       status,
       featured,
+      weight,
+      width,
+      height,
+      length,
     } = body;
 
     // Verificar que el producto existe
@@ -98,6 +102,10 @@ export async function PUT(
         categoryId: categoryId || null,
         status,
         featured,
+        weight: weight ? Number(weight) : null,
+        width: width ? Number(width) : null,
+        height: height ? Number(height) : null,
+        length: length ? Number(length) : null,
       },
       include: {
         category: true,
