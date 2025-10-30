@@ -58,8 +58,9 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     name: product?.name || "",
     slug: product?.slug || "",
     description: product?.description || "",
-    price: product?.price || 0,
-    compareAtPrice: product?.compareAtPrice || null,
+    // Convertir de centavos a pesos para mostrar en el formulario
+    price: product?.price ? product.price / 100 : 0,
+    compareAtPrice: product?.compareAtPrice ? product.compareAtPrice / 100 : null,
     sku: product?.sku || "",
     stock: product?.stock || 0,
     images: parseImages(product?.images),
@@ -92,10 +93,17 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
       
       const method = isEdit ? 'PUT' : 'POST';
       
+      // Convertir precios de pesos a centavos antes de enviar
+      const dataToSend = {
+        ...formData,
+        price: Math.round(formData.price * 100),
+        compareAtPrice: formData.compareAtPrice ? Math.round(formData.compareAtPrice * 100) : null,
+      };
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!response.ok) {
