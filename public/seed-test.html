@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ejecutar Seed de Producto de Prueba</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; margin-top: 0; }
+        button {
+            background: #0070f3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #0051cc; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Limpiar Productos y Crear Producto de Prueba</h1>
+        <p><strong>⚠️ ADVERTENCIA:</strong> Esto eliminará TODOS los productos existentes y creará solo uno de prueba con dimensiones completas para Mercado Envíos.</p>
+        
+        <button onclick="runSeed()" id="btnSeed">Ejecutar Limpieza</button>
+        <button onclick="window.location.href='https://wokykids.com.ar/admin/productos'">Ver Productos</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function runSeed() {
+            const btn = document.getElementById('btnSeed');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            result.className = 'result loading';
+            result.textContent = '⏳ Ejecutando seed...';
+            
+            try {
+                const response = await fetch('/api/admin/seed-test', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'result success';
+                    result.textContent = `✅ Éxito!\n\n` +
+                        `Productos eliminados: ${data.deletedProducts}\n\n` +
+                        `Producto creado:\n` +
+                        `- Nombre: ${data.testProduct.name}\n` +
+                        `- Precio: ${data.testProduct.price}\n` +
+                        `- Stock: ${data.testProduct.stock} unidades\n` +
+                        `- Dimensiones: ${data.testProduct.dimensions}\n` +
+                        `- Peso: ${data.testProduct.weight}\n` +
+                        `- ✅ Listo para Mercado Envíos: ${data.testProduct.hasDimensions ? 'Sí' : 'No'}`;
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ Error: ${error.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
