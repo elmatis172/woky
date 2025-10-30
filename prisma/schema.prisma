@@ -29,6 +29,13 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum ShippingMethodType {
+  STANDARD
+  EXPRESS
+  PICKUP
+  FREE
+}
+
 // enum ShippingStatus {
 //   PENDING
 //   PROCESSING
@@ -139,6 +146,24 @@ model Product {
   @@index([featured])
 }
 
+model ShippingMethod {
+  id          String             @id @default(cuid())
+  name        String             // "Envío a domicilio", "Retiro en sucursal"
+  description String?
+  type        ShippingMethodType @default(STANDARD)
+  cost        Int                // Costo en centavos
+  estimatedDays String?          // "2-3 días hábiles"
+  isActive    Boolean            @default(true)
+  provinces   String?            // JSON array de provincias donde aplica (null = todas)
+  minAmount   Int?               // Monto mínimo para este método (null = sin mínimo)
+  maxAmount   Int?               // Monto máximo para este método (null = sin máximo)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([isActive])
+  @@index([type])
+}
+
 model Order {
   id              String         @id @default(cuid())
   userId          String?
@@ -151,6 +176,7 @@ model Order {
   shipping        Int            @default(0)
   discount        Int            @default(0)
   totalAmount     Int            // En centavos
+  shippingMethodId String?
   mpPreferenceId  String?        @unique
   mpPaymentId     String?        @unique
   timeline        String?        // JSON string de array de eventos
