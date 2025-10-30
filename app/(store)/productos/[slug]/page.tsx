@@ -15,35 +15,32 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = await db.product.findUnique({
-    where: { slug },
-  });
-
-  if (!product) {
-    return {
-      title: "Producto no encontrado",
-    };
-  }
-
-  return {
-    title: product.name,
-    description: product.description,
-    openGraph: {
-      title: product.name,
-      description: product.description,
-      images: product.images[0] ? [product.images[0]] : [],
-    },
-  };
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params;
-  const product = await db.product.findUnique({
     where: {
       slug,
       status: "PUBLISHED",
     },
-    include: {
-      category: true,
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      sku: true,
+      price: true,
+      compareAtPrice: true,
+      images: true,
+      stock: true,
+      attributes: true,
+      weight: true,
+      width: true,
+      height: true,
+      length: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 
@@ -140,3 +137,4 @@ export default async function ProductPage({ params }: ProductPageProps) {
     </div>
   );
 }
+
