@@ -73,6 +73,11 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           featured: product.featured,
           categoryId: product.categoryId ?? undefined,
           images,
+          // Dimensiones para Mercado Envíos
+          weight: product.weight ?? undefined,
+          width: product.width ?? undefined,
+          height: product.height ?? undefined,
+          length: product.length ?? undefined,
         }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
         isEdit={true}
