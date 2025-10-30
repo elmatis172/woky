@@ -18,7 +18,7 @@ export async function POST() {
       update: {
         name: "Envío Local CABA/GBA",
         description: "Envío en el día para CABA y Gran Buenos Aires",
-        type: "LOCAL",
+        type: "STANDARD",
         cost: 50000, // $500
         estimatedDays: "24 horas",
         isActive: true,
@@ -28,7 +28,7 @@ export async function POST() {
         id: "local-caba-gba",
         name: "Envío Local CABA/GBA",
         description: "Envío en el día para CABA y Gran Buenos Aires",
-        type: "LOCAL",
+        type: "STANDARD",
         cost: 50000,
         estimatedDays: "24 horas",
         isActive: true,
@@ -42,7 +42,7 @@ export async function POST() {
       update: {
         name: "Envío a Domicilio",
         description: "Envío estándar a todo el país",
-        type: "STANDARD",
+        type: "EXPRESS",
         cost: 150000, // $1500
         estimatedDays: "3-5 días hábiles",
         isActive: true,
@@ -52,7 +52,7 @@ export async function POST() {
         id: "standard-nacional",
         name: "Envío a Domicilio",
         description: "Envío estándar a todo el país",
-        type: "STANDARD",
+        type: "EXPRESS",
         cost: 150000,
         estimatedDays: "3-5 días hábiles",
         isActive: true,
