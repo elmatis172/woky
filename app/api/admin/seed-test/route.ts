@@ -2,15 +2,48 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
-export async function POST(request: Request) {
+// GET para verificar autenticación
+export async function GET() {
   try {
     const session = await auth();
+    
+    return NextResponse.json({
+      authenticated: !!session,
+      isAdmin: session?.user?.role === "ADMIN",
+      user: session?.user ? {
+        email: session.user.email,
+        role: session.user.role,
+        name: session.user.name,
+      } : null,
+      message: session?.user?.role === "ADMIN" 
+        ? "✅ Estás autenticado como ADMIN. Podés usar POST para ejecutar el seed."
+        : "❌ No tenés permisos de ADMIN. Iniciá sesión con una cuenta de administrador.",
+    });
+  } catch (error) {
+    console.error("Error en GET:", error);
+    return NextResponse.json({ error: "Error verificando autenticación" }, { status: 500 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    console.log("🔍 Verificando autenticación...");
+    const session = await auth();
+
+    console.log("Session:", session ? "Existe" : "No existe");
+    console.log("User role:", session?.user?.role);
 
     // Solo admins pueden ejecutar esto
     if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+      console.log("❌ Usuario no autorizado");
+      return NextResponse.json({ 
+        error: "No autorizado. Debes estar logueado como ADMIN.",
+        hasSession: !!session,
+        userRole: session?.user?.role || "none"
+      }, { status: 401 });
     }
 
+    console.log("✅ Usuario autorizado");
     console.log("🗑️  Limpiando productos existentes...");
 
     // Eliminar todos los productos
@@ -68,9 +101,14 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error en seed:", error);
+    console.error("❌ Error en seed:", error);
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
-      { error: "Error al ejecutar seed" },
+      { 
+        error: "Error al ejecutar seed",
+        details: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
