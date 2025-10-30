@@ -169,11 +169,41 @@ Ejecutar migraciones en producción y poblar métodos de envío por defecto.
 
 ### ⚠️ PRÓXIMOS PASOS CRÍTICOS
 
-1. **Esperar Deploy de Vercel** (en progreso...)
-2. **Ejecutar Seed** de métodos de envío
-3. **Agregar dimensiones** a productos existentes
-4. **Probar flujo completo** de compra
-5. **Configurar Mercado Envíos** en panel de MP (si es necesario)
+1. ✅ **Deploy de Vercel completado** 
+2. 🔄 **Ejecutar Seeds:**
+   - Abrir: https://wokykids.com.ar/seed-test.html (Limpia productos, crea 1 de prueba)
+   - Método alternativo: POST a https://wokykids.com.ar/api/admin/seed-test
+3. ⏳ **Agregar dimensiones** a productos existentes (o usar el de prueba)
+4. ⏳ **Probar flujo completo** de compra
+5. ⏳ **Configurar Mercado Envíos** en panel de MP (si es necesario)
+
+### 📝 Scripts Disponibles
+
+```bash
+# Seed de métodos de envío (4 métodos por defecto)
+npm run db:seed:shipping
+
+# Limpiar productos y crear uno de prueba
+npm run db:seed:test
+```
+
+### 🌐 Endpoints API
+
+```
+POST https://wokykids.com.ar/api/admin/seed-test
+  → Limpia todos los productos y crea "Remera Estampada WOKY Kids"
+  → Requiere estar logueado como ADMIN
+```
+
+### 🎯 Producto de Prueba Creado
+
+**Remera Estampada WOKY Kids**
+- Precio: $15,000 (antes $20,000 - 25% OFF)
+- Stock: 50 unidades
+- Dimensiones: 30x25x2 cm
+- Peso: 250g
+- ✅ Completo para Mercado Envíos
+- SKU: WKY-REM-001
 
 ### 📊 COMMITS REALIZADOS
 
