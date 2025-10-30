@@ -7,19 +7,22 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { zipCode, province, items } = body;
 
-    if (!zipCode || !province || !items || !Array.isArray(items)) {
+    console.log("📬 Solicitud de cálculo de envío:");
+    console.log(`   - CP: ${zipCode}`);
+    console.log(`   - Provincia: ${province}`);
+    console.log(`   - Items: ${items?.length || 0}`);
+
+    if (!zipCode || !province || !items || items.length === 0) {
       return NextResponse.json(
         { error: "Faltan datos requeridos" },
         { status: 400 }
       );
     }
 
-    // Obtener productos con sus dimensiones
+    // Obtener IDs de productos para buscar dimensiones
     const productIds = items.map((item: any) => item.productId);
     const products = await db.product.findMany({
-      where: {
-        id: { in: productIds },
-      },
+      where: { id: { in: productIds } },
       select: {
         id: true,
         weight: true,
@@ -28,8 +31,6 @@ export async function POST(request: Request) {
         length: true,
       },
     });
-
-    console.log("🗄️ Productos desde DB:", JSON.stringify(products, null, 2));
 
     // Mapear items con dimensiones
     const itemsWithDimensions = items.map((item: any) => {
@@ -57,6 +58,8 @@ export async function POST(request: Request) {
       where: { isActive: true },
     });
 
+    console.log(`📋 Métodos locales activos: ${localMethods.length}`);
+
     // Obtener todas las opciones (locales + Mercado Envíos)
     const options = await getAvailableShippingOptions({
       zipCode,
@@ -66,11 +69,16 @@ export async function POST(request: Request) {
       localMethods,
     });
 
+    console.log("✅ Opciones calculadas:");
+    console.log(`   - Locales: ${options.local.length}`);
+    console.log(`   - Mercado Envíos: ${options.mercadoEnvios.length}`);
+    console.log(`   - Total: ${options.all.length}`);
+
     return NextResponse.json(options);
   } catch (error) {
-    console.error("Error calculating shipping:", error);
+    console.error("❌ Error en /api/shipping/calculate:", error);
     return NextResponse.json(
-      { error: "Error al calcular opciones de envío" },
+      { error: "Error al calcular envío" },
       { status: 500 }
     );
   }

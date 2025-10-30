@@ -45,6 +45,12 @@ export async function calculateMercadoEnvios(
   try {
     const accessToken = env.MP_ACCESS_TOKEN;
 
+    // Validar que el token esté configurado
+    if (!accessToken || accessToken === "your-mercadopago-access-token-here") {
+      console.warn("⚠️ MP_ACCESS_TOKEN no configurado - Mercado Envíos no disponible");
+      return [];
+    }
+
     console.log("🔍 Items recibidos para calcular ME:", JSON.stringify(items, null, 2));
 
     // Filtrar items que tienen todas las dimensiones necesarias
@@ -74,6 +80,11 @@ export async function calculateMercadoEnvios(
 
     const dimensions = `${maxLength}x${maxWidth}x${maxHeight}`;
 
+    console.log("📦 Datos enviados a Mercado Envíos:");
+    console.log(`   - CP: ${zipCode}`);
+    console.log(`   - Peso: ${totalWeight}g`);
+    console.log(`   - Dimensiones: ${dimensions} cm`);
+
     // Llamar a la API de Mercado Envíos
     const response = await fetch(
       "https://api.mercadolibre.com/sites/MLA/shipping_options",
@@ -97,14 +108,16 @@ export async function calculateMercadoEnvios(
 
     if (!response.ok) {
       const error = await response.json();
-      console.error("Error calculando envío:", error);
+      console.error("❌ Error calculando envío desde Mercado Libre:", error);
       return [];
     }
 
     const data: MercadoEnviosResponse = await response.json();
+    console.log(`✅ Mercado Envíos devolvió ${data.options?.length || 0} opciones`);
+    
     return data.options || [];
   } catch (error) {
-    console.error("Error en calculateMercadoEnvios:", error);
+    console.error("❌ Error en calculateMercadoEnvios:", error);
     return [];
   }
 }
@@ -137,6 +150,12 @@ export async function getAvailableShippingOptions(params: {
 }) {
   const { zipCode, province, cartTotal, items, localMethods } = params;
 
+  console.log("🚚 Calculando opciones de envío...");
+  console.log(`   - Provincia: ${province}`);
+  console.log(`   - CP: ${zipCode}`);
+  console.log(`   - Total carrito: $${cartTotal / 100}`);
+  console.log(`   - Productos: ${items.length}`);
+
   // Filtrar métodos locales que aplican
   const validLocalMethods = localMethods.filter((method) => {
     // Verificar monto mínimo
@@ -154,6 +173,8 @@ export async function getAvailableShippingOptions(params: {
     return true;
   });
 
+  console.log(`✅ Métodos locales válidos: ${validLocalMethods.length}/${localMethods.length}`);
+
   // Obtener opciones de Mercado Envíos (solo para envíos a domicilio)
   const mercadoEnviosOptions = await calculateMercadoEnvios(zipCode, items);
 
@@ -162,11 +183,13 @@ export async function getAvailableShippingOptions(params: {
     id: `mercadoenvios-${option.id}`,
     name: option.name,
     type: "MERCADOENVIOS",
-    cost: option.cost * 100, // Convertir a centavos
+    cost: Math.round(option.cost * 100), // Convertir a centavos
     estimatedDays: option.estimated_delivery_time.date,
     isMercadoEnvios: true,
     mercadoEnviosId: option.shipping_method_id,
   }));
+
+  console.log(`✅ Opciones de Mercado Envíos: ${formattedMercadoEnvios.length}`);
 
   // Combinar ambos
   return {
