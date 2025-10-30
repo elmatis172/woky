@@ -344,10 +344,14 @@ export default function CarritoPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Envío</span>
                   <span>
-                    {shipping === 0 ? (
-                      <span className="text-green-600 font-semibold">¡Gratis!</span>
+                    {selectedShipping ? (
+                      selectedShipping.cost === 0 ? (
+                        <span className="text-green-600 font-semibold">¡Gratis!</span>
+                      ) : (
+                        formatPrice(selectedShipping.cost)
+                      )
                     ) : (
-                      formatPrice(shipping)
+                      <span className="text-gray-500">Calculá en el siguiente paso</span>
                     )}
                   </span>
                 </div>
@@ -356,12 +360,6 @@ export default function CarritoPage() {
                   <span>Total</span>
                   <span>{formatPrice(total)}</span>
                 </div>
-
-                {subtotal < 50000 && (
-                  <p className="text-xs text-muted-foreground">
-                    Agregá {formatPrice(50000 - subtotal)} más para envío gratis
-                  </p>
-                )}
               </CardContent>
               <CardFooter className="flex flex-col gap-2">
                 <Button 
@@ -613,10 +611,14 @@ export default function CarritoPage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Envío</span>
                     <span>
-                      {shipping === 0 ? (
-                        <span className="text-green-600 font-semibold">¡Gratis!</span>
+                      {selectedShipping ? (
+                        selectedShipping.cost === 0 ? (
+                          <span className="text-green-600 font-semibold">¡Gratis!</span>
+                        ) : (
+                          formatPrice(selectedShipping.cost)
+                        )
                       ) : (
-                        formatPrice(shipping)
+                        <span className="text-gray-500">A calcular</span>
                       )}
                     </span>
                   </div>
