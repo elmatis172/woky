@@ -98,7 +98,20 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         ...formData,
         price: Math.round(formData.price * 100),
         compareAtPrice: formData.compareAtPrice ? Math.round(formData.compareAtPrice * 100) : null,
+        // Asegurar que las dimensiones sean números o null (no 0)
+        weight: formData.weight || null,
+        width: formData.width || null,
+        height: formData.height || null,
+        length: formData.length || null,
       };
+      
+      console.log("📦 Datos a enviar:", dataToSend);
+      console.log("📐 Dimensiones:", {
+        weight: dataToSend.weight,
+        width: dataToSend.width,
+        height: dataToSend.height,
+        length: dataToSend.length
+      });
       
       const response = await fetch(url, {
         method,
