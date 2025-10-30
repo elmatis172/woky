@@ -133,6 +133,13 @@ model Product {
   attributes     String?       // JSON string de atributos variables
   status         ProductStatus @default(DRAFT)
   featured       Boolean       @default(false)
+  
+  // Dimensiones y peso para Mercado Envíos
+  weight         Int?          // Peso en gramos
+  width          Int?          // Ancho en cm
+  height         Int?          // Alto en cm
+  length         Int?          // Largo en cm
+  
   categoryId     String?
   category       Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   orderItems     OrderItem[]
