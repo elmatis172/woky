@@ -45,14 +45,19 @@ export async function calculateMercadoEnvios(
   try {
     const accessToken = env.MP_ACCESS_TOKEN;
 
+    console.log("🔍 Items recibidos para calcular ME:", JSON.stringify(items, null, 2));
+
     // Filtrar items que tienen todas las dimensiones necesarias
     const validItems = items.filter(
       (item) =>
         item.weight && item.width && item.height && item.length
     );
 
+    console.log(`✅ Items válidos (con dimensiones completas): ${validItems.length}/${items.length}`);
+    console.log("📦 Items válidos:", JSON.stringify(validItems, null, 2));
+
     if (validItems.length === 0) {
-      console.warn("No hay productos con dimensiones completas para calcular envío");
+      console.warn("⚠️ No hay productos con dimensiones completas para calcular envío");
       return [];
     }
 

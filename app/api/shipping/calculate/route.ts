@@ -29,6 +29,8 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log("🗄️ Productos desde DB:", JSON.stringify(products, null, 2));
+
     // Mapear items con dimensiones
     const itemsWithDimensions = items.map((item: any) => {
       const product = products.find((p: any) => p.id === item.productId);
@@ -41,6 +43,8 @@ export async function POST(request: Request) {
         length: product?.length,
       };
     });
+
+    console.log("📦 Items con dimensiones mapeados:", JSON.stringify(itemsWithDimensions, null, 2));
 
     // Calcular total del carrito
     const cartTotal = items.reduce(
