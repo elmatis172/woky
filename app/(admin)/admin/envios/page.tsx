@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Settings } from "lucide-react";
 import { ShippingMethodCard } from "@/components/admin/shipping-method-card";
 
 export const metadata = {
@@ -31,13 +31,23 @@ export default async function ShippingMethodsPage() {
             Configurá los métodos de envío disponibles para tus clientes
           </p>
         </div>
-        <Link
-          href="/admin/envios/nuevo"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Método
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/setup-shipping.html"
+            target="_blank"
+            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Setup Inicial
+          </Link>
+          <Link
+            href="/admin/envios/nuevo"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Método
+          </Link>
+        </div>
       </div>
 
       {shippingMethods.length === 0 ? (
