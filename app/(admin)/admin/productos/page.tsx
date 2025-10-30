@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Plus } from "lucide-react";
 import { parseImages } from "@/lib/json-helpers";
 import { ProductActions } from "@/components/admin/product-actions";
+import { formatPrice } from "@/lib/utils";
 
 export default async function ProductsAdminPage() {
   const products = await db.product.findMany({
@@ -89,7 +90,7 @@ export default async function ProductsAdminPage() {
                       {product.category?.name || "Sin categoría"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
-                      ${product.price.toLocaleString("es-AR")}
+                      {formatPrice(product.price)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
