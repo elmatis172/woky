@@ -3,6 +3,21 @@ import { db } from "@/lib/db";
 import { getAvailableShippingOptions } from "@/lib/mercado-envios";
 import { calculateOCAShipping } from "@/lib/oca";
 
+// Tipo base para opciones de envío
+type ShippingOption = {
+  id: string;
+  name: string;
+  type: string;
+  cost: number;
+  estimatedDays: string | null;
+  isMercadoEnvios: boolean;
+  mercadoEnviosId?: number;
+  isOCA?: boolean;
+  provinces: string | null;
+  minAmount: number | null;
+  maxAmount: number | null;
+};
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -76,8 +91,9 @@ export async function POST(request: Request) {
     console.log(`   - Total: ${options.all.length}`);
 
     // Agregar opciones de OCA
+    let ocaOptions: ShippingOption[] = [];
     try {
-      const ocaOptions = await calculateOCAShipping({
+      ocaOptions = await calculateOCAShipping({
         items: itemsWithDimensions.map((item: any) => ({
           weight: item.weight,
           width: item.width,
@@ -92,14 +108,18 @@ export async function POST(request: Request) {
       console.log(`🚚 Opciones OCA: ${ocaOptions.length}`);
 
       // Agregar opciones de OCA al total
-      options.all = [...options.all, ...ocaOptions];
-      options.oca = ocaOptions;
+      options.all = [...options.all, ...ocaOptions] as ShippingOption[];
     } catch (ocaError) {
       console.error("⚠️ Error calculando envíos OCA:", ocaError);
-      options.oca = [];
     }
 
-    return NextResponse.json(options);
+    return NextResponse.json({
+      success: true,
+      local: options.local,
+      mercadoEnvios: options.mercadoEnvios,
+      oca: ocaOptions,
+      all: options.all,
+    });
   } catch (error) {
     console.error("❌ Error en /api/shipping/calculate:", error);
     return NextResponse.json(

@@ -36,9 +36,9 @@ interface ShippingOption {
   estimatedDays: string | null
   isMercadoEnvios: boolean
   isOCA?: boolean
-  provinces?: string | null
-  minAmount?: number | null
-  maxAmount?: number | null
+  provinces: string | null
+  minAmount: number | null
+  maxAmount: number | null
 }
 
 /**
