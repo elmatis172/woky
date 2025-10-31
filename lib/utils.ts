@@ -6,12 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number): string {
+  // Los precios están en centavos (según schema.prisma), convertir a pesos
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(price)
+  }).format(price / 100)
 }
 
 export function calculateDiscount(price: number, compareAtPrice: number | null): number {
