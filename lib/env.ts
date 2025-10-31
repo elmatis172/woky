@@ -16,6 +16,14 @@ export const env = {
   MP_ACCESS_TOKEN: getEnvVar("MP_ACCESS_TOKEN", false),
   MP_PUBLIC_KEY: getEnvVar("MP_PUBLIC_KEY", false),
   
+  // OCA
+  OCA_CUIT: getEnvVar("OCA_CUIT", false),
+  OCA_TEST_MODE: getEnvVar("OCA_TEST_MODE", false),
+  OCA_USERNAME: getEnvVar("OCA_USERNAME", false),
+  OCA_PASSWORD: getEnvVar("OCA_PASSWORD", false),
+  OCA_ACCOUNT_NUMBER: getEnvVar("OCA_ACCOUNT_NUMBER", false),
+  OCA_ORIGIN_ZIP_CODE: getEnvVar("OCA_ORIGIN_ZIP_CODE", false),
+  
   // Base de datos
   DATABASE_URL: getEnvVar("DATABASE_URL"),
   
@@ -38,4 +46,9 @@ if (!env.MP_ACCESS_TOKEN || env.MP_ACCESS_TOKEN === "your-mercadopago-access-tok
 
 if (!env.MP_PUBLIC_KEY || env.MP_PUBLIC_KEY === "your-mercadopago-public-key-here") {
   console.warn("⚠️ MP_PUBLIC_KEY no configurado - Mercado Pago no estará disponible");
+}
+
+// Validar configuración de OCA al inicio (solo warning)
+if (!env.OCA_CUIT) {
+  console.warn("⚠️ OCA_CUIT no configurado - Envíos OCA no estarán disponibles");
 }

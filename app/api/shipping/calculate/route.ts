@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAvailableShippingOptions } from "@/lib/mercado-envios";
+import { calculateOCAShipping } from "@/lib/oca";
 
 export async function POST(request: Request) {
   try {
@@ -73,6 +74,30 @@ export async function POST(request: Request) {
     console.log(`   - Locales: ${options.local.length}`);
     console.log(`   - Mercado Envíos: ${options.mercadoEnvios.length}`);
     console.log(`   - Total: ${options.all.length}`);
+
+    // Agregar opciones de OCA
+    try {
+      const ocaOptions = await calculateOCAShipping({
+        items: itemsWithDimensions.map((item: any) => ({
+          weight: item.weight,
+          width: item.width,
+          height: item.height,
+          length: item.length,
+          price: items.find((i: any) => i.productId === item.id)?.price || 0,
+          quantity: item.quantity,
+        })),
+        zipCode,
+      });
+
+      console.log(`🚚 Opciones OCA: ${ocaOptions.length}`);
+
+      // Agregar opciones de OCA al total
+      options.all = [...options.all, ...ocaOptions];
+      options.oca = ocaOptions;
+    } catch (ocaError) {
+      console.error("⚠️ Error calculando envíos OCA:", ocaError);
+      options.oca = [];
+    }
 
     return NextResponse.json(options);
   } catch (error) {

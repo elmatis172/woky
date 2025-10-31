@@ -106,14 +106,25 @@ export async function calculateMercadoEnvios(
       }
     );
 
+    console.log(`🌐 Mercado Envíos API response status: ${response.status}`);
+
     if (!response.ok) {
-      const error = await response.json();
-      console.error("❌ Error calculando envío desde Mercado Libre:", error);
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = errorText;
+      }
+      console.error("❌ Error calculando envío desde Mercado Libre:");
+      console.error(`   Status: ${response.status}`);
+      console.error(`   Response:`, errorData);
       return [];
     }
 
     const data: MercadoEnviosResponse = await response.json();
-    console.log(`✅ Mercado Envíos devolvió ${data.options?.length || 0} opciones`);
+    console.log("✅ Mercado Envíos respuesta completa:", JSON.stringify(data, null, 2));
+    console.log(`✅ Opciones disponibles: ${data.options?.length || 0}`);
     
     return data.options || [];
   } catch (error) {
