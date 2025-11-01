@@ -469,7 +469,7 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         {formData.hasVariants && (
           <ProductVariantsForm
             variants={formData.variants}
-            onChange={(variants) => setFormData({ ...formData, variants })}
+            onVariantsChange={(variants) => setFormData({ ...formData, variants })}
           />
         )}
 
