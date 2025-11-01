@@ -4,7 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const createOrderSchema = z.object({
-  items: z.array(`n    z.object({`n      productId: z.string(),`n      variantId: z.string().nullable().optional(), // ID de variante si existe`n      quantity: z.number().int().positive(),`n    })`n  ),
+  items: z.array(
+    z.object({
+      productId: z.string(),
+      variantId: z.string().nullable().optional(), // ID de variante si existe
+      quantity: z.number().int().positive(),
+    })
+  ),
   email: z.string().email(),
   customerData: z
     .object({

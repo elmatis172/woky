@@ -77,8 +77,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           weight: product.weight ?? undefined,
           width: product.width ?? undefined,
           height: product.height ?? undefined,
-          length: product.length ?? undefined,
-        }}
+          length: product.length ?? undefined,`n          // Costos y márgenes`n          cost: product.cost ?? undefined,`n          additionalCosts: product.additionalCosts ?? undefined,`n        }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
           // Costos y márgenes
           cost: product.cost ?? undefined,

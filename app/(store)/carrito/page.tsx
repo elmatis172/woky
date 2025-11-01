@@ -14,7 +14,22 @@ import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface CartItem {`n  id: string;`n  productId: string; // ID original del producto`n  name: string;`n  slug: string;`n  price: number;`n  image: string;`n  quantity: number;`n  stock: number;`n  weight?: number | null;`n  width?: number | null;`n  height?: number | null;`n  length?: number | null;`n  variantId?: string | null; // ID de la variante si existe`n  variantSize?: string | null; // Talle de la variante`n}
+interface CartItem {
+  id: string;
+  productId: string; // ID original del producto
+  name: string;
+  slug: string;
+  price: number;
+  image: string;
+  quantity: number;
+  stock: number;
+  weight?: number | null;
+  width?: number | null;
+  height?: number | null;
+  length?: number | null;
+  variantId?: string | null; // ID de la variante si existe
+  variantSize?: string | null; // Talle de la variante
+}
 
 interface ShippingOption {
   id: string;

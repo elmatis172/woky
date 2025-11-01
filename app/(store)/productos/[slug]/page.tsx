@@ -42,7 +42,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
       slug,
       status: "PUBLISHED",
     },
-    include: {`n      category: true,`n      variants: {`n        where: {`n          isActive: true,`n        },`n        orderBy: {`n          sortOrder: 'asc',`n        },`n      },`n    },
+    include: {
+      category: true,
+      variants: {
+        where: {
+          isActive: true,
+        },
+        orderBy: {
+          sortOrder: 'asc',`n        },`n      },`n    },
   });
 
   if (!product) {

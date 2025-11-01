@@ -126,7 +126,6 @@ export default async function FinanzasPage() {
   );
 
   const productsWithoutCost = await db.product.count({ where: { cost: null } });
-    .reduce((sum: number, order: OrderData) => sum + order.totalAmount, 0);
 
   const statusLabels: Record<string, string> = {
     PENDING: "Pendiente",
