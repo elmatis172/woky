@@ -16,6 +16,8 @@ interface ProductFormData {
   price: number;
   compareAtPrice: number | null;
   sku: string;
+  cost: number | null; // Costo del producto
+  additionalCosts: number | null; // Gastos adicionales (bolsas, etiquetas, etc)
   stock: number;
   images: string[];
   categoryId: string;
@@ -67,6 +69,8 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     price: product?.price ? product.price / 100 : 0,
     compareAtPrice: product?.compareAtPrice ? product.compareAtPrice / 100 : null,
     sku: product?.sku || "",
+    cost: product?.cost ? product.cost / 100 : null,
+    additionalCosts: product?.additionalCosts ? product.additionalCosts / 100 : null,
     stock: product?.stock || 0,
     images: parseImages(product?.images),
     categoryId: product?.categoryId || "",
@@ -107,6 +111,8 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         price: Math.round(formData.price * 100),
         compareAtPrice: formData.compareAtPrice ? Math.round(formData.compareAtPrice * 100) : null,
         // Asegurar que las dimensiones sean números o null (no 0)
+        cost: formData.cost ? Math.round(formData.cost * 100) : null,
+        additionalCosts: formData.additionalCosts ? Math.round(formData.additionalCosts * 100) : null,
         weight: formData.weight || null,
         width: formData.width || null,
         height: formData.height || null,
@@ -234,6 +240,16 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     return 0;
   };
 
+
+  const calculateProfit = () => {
+    const totalCost = (formData.cost || 0) + (formData.additionalCosts || 0);
+    if (totalCost > 0 && formData.price > 0) {
+      const profit = formData.price - totalCost;
+      const margin = (profit / formData.price) * 100;
+      return { profit, margin, totalCost };
+    }
+    return null;
+  };
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
@@ -340,6 +356,82 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
             )}
           </div>
 
+
+          <div>
+            <Label htmlFor="cost">Costo del Producto</Label>
+            <Input
+              id="cost"
+              type="number"
+              value={formData.cost || ""}
+              onChange={(e) => setFormData({ ...formData, cost: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+            <p className="text-xs text-gray-500 mt-1">Precio de compra o fabricación</p>
+          </div>
+
+          <div>
+            <Label htmlFor="additionalCosts">Gastos Adicionales</Label>
+            <Input
+              id="additionalCosts"
+              type="number"
+              value={formData.additionalCosts || ""}
+              onChange={(e) => setFormData({ ...formData, additionalCosts: e.target.value ? Number(e.target.value) : null })}
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+            <p className="text-xs text-gray-500 mt-1">Bolsas, etiquetas, packaging, etc.</p>
+
+{calculateProfit() && (
+            <div className="col-span-full mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">📊 Análisis de Rentabilidad</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Costo Total</p>
+                  <p className="font-bold text-gray-900 dark:text-white">${calculateProfit()!.totalCost.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Precio Venta</p>
+                  <p className="font-bold text-gray-900 dark:text-white">${formData.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Ganancia</p>
+                  <p className="font-bold text-green-600 dark:text-green-400">${calculateProfit()!.profit.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Margen</p>
+                  <p className="font-bold text-green-600 dark:text-green-400">{calculateProfit()!.margin.toFixed(1)}%</p>
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+
+          {calculateProfit() && (
+            <div className="col-span-full mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">📊 Análisis de Rentabilidad</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Costo Total</p>
+                  <p className="font-bold text-gray-900 dark:text-white">${calculateProfit()!.totalCost.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Precio Venta</p>
+                  <p className="font-bold text-gray-900 dark:text-white">${formData.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Ganancia</p>
+                  <p className="font-bold text-green-600 dark:text-green-400">${calculateProfit()!.profit.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">Margen</p>
+                  <p className="font-bold text-green-600 dark:text-green-400">{calculateProfit()!.margin.toFixed(1)}%</p>
+                </div>
+              </div>
+            </div>
+          )}
           <div>
             <Label htmlFor="sku">SKU (Código)</Label>
             <Input

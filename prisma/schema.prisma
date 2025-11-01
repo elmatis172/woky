@@ -120,6 +120,8 @@ model Product {
   price          Int           // Precio en centavos ARS
   compareAtPrice Int?          // Precio anterior (para mostrar descuento)
   currency       String        @default("ARS")
+  cost           Int?          // Costo del producto en centavos (precio de compra/fabricación)
+  additionalCosts Int?         // Costos adicionales en centavos (bolsas, etiquetas, packaging)
   images         String        // JSON string de array de URLs
   stock          Int           @default(0)
   attributes     String?       // JSON string de atributos variables
