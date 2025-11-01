@@ -475,7 +475,7 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
 
         {!formData.hasVariants && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p>Activá "Tiene talles" para gestionar variantes de este producto</p>
+            <p>Activá &quot;Tiene talles&quot; para gestionar variantes de este producto</p>
           </div>
         )}
       </div>
@@ -678,3 +678,4 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     </form>
   );
 }
+
