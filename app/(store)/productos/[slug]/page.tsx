@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
-import { AddToCartButton } from "@/components/add-to-cart-button";
+import { ProductActions } from "@/components/product-actions";
 import { ProductGallery } from "@/components/product-gallery";
 import { Badge } from "@/components/ui/badge";
 
@@ -42,9 +42,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       slug,
       status: "PUBLISHED",
     },
-    include: {
-      category: true,
-    },
+    include: {`n      category: true,`n      variants: {`n        where: {`n          isActive: true,`n        },`n        orderBy: {`n          sortOrder: 'asc',`n        },`n      },`n    },
   });
 
   if (!product) {
@@ -78,36 +76,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <p className="text-sm text-muted-foreground">SKU: {product.sku}</p>
           )}
 
-          <div className="flex items-baseline gap-3">
-            <p className="text-3xl font-bold">
-              {formatPrice(product.price)}
-            </p>
-            {hasDiscount && (
-              <>
-                <p className="text-xl text-muted-foreground line-through">
-                  {formatPrice(product.compareAtPrice!)}
-                </p>
-                <Badge variant="destructive">-{discountPercentage}%</Badge>
-              </>
-            )}
-          </div>
-
-          {product.stock > 0 ? (
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              <p className="text-sm text-green-600 dark:text-green-400">
-                En stock ({product.stock} disponibles)
-              </p>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-red-500" />
-              <p className="text-sm text-red-600 dark:text-red-400">
-                Sin stock
-              </p>
-            </div>
-          )}
-
+          
           {product.description && (
             <div className="prose prose-sm dark:prose-invert">
               <p>{product.description}</p>
@@ -134,9 +103,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           )}
 
-          <AddToCartButton product={product} disabled={product.stock === 0} />
+          <ProductActions 
+            product={product}
+            variants={product.variants || []}
+          />
+
         </div>
       </div>
     </div>
   );
 }
+
+
+

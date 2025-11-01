@@ -5,37 +5,14 @@ import { ShoppingCart, Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
-interface AddToCartButtonProps {
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    price: number;
-    stock: number;
-    images: any;
-    weight?: number | null;
-    width?: number | null;
-    height?: number | null;
-    length?: number | null;
-  };
-  selectedVariant?: {
-    id: string;
-    size: string;
-    stock: number;
-    price: number | null;
-  } | null;
+interface AddToCartButtonProps {`n  product: {`n    id: string;`n    name: string;`n    slug: string;`n    price: number;`n    stock: number;`n    images: any;`n    weight?: number | null;`n    width?: number | null;`n    height?: number | null;`n    length?: number | null;`n  };`n  selectedVariant?: {`n    id: string;`n    size: string;`n    stock: number;`n    price: number | null;`n  } | null;`n  disabled?: boolean;`n};
   disabled?: boolean;
-  requiresVariant?: boolean;
 }
 
-export function AddToCartButton({ product, selectedVariant, disabled, requiresVariant = false }: AddToCartButtonProps) {
+export function AddToCartButton({ product, selectedVariant, disabled }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Determinar stock y precio basado en si hay variante seleccionada
-  const effectiveStock = selectedVariant ? selectedVariant.stock : product.stock;
-  const effectivePrice = selectedVariant?.price ?? product.price;
-
+  const [isAdding, setIsAdding] = useState(false);`n`n  // Determinar stock y precio basado en si hay variante seleccionada`n  const effectiveStock = selectedVariant ? selectedVariant.stock : product.stock;`n  const effectivePrice = selectedVariant?.price ?? product.price;
+  
   // Parsear imágenes
   const parseImages = (images: any): string[] => {
     if (!images) return ["/placeholder.png"];
@@ -52,35 +29,21 @@ export function AddToCartButton({ product, selectedVariant, disabled, requiresVa
   };
 
   const handleAddToCart = async () => {
-    // Validar que haya variante seleccionada si es requerida
-    if (requiresVariant && !selectedVariant) {
-      toast({
-        title: "Selecciona un talle",
-        description: "Por favor selecciona un talle antes de agregar al carrito",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsAdding(true);
 
+    // Aquí implementarías la lógica de agregar al carrito
+    // Por ahora usamos localStorage
     try {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      
-      // Si hay variante, usamos un ID único que combine producto + variante
-      const cartItemId = selectedVariant 
-        ? `${product.id}-${selectedVariant.id}` 
-        : product.id;
-      
-      const existingItem = cart.find((item: any) => item.id === cartItemId);
+      const existingItem = cart.find((item: any) => item.id === product.id);
 
       if (existingItem) {
         // Validar que no exceda el stock
         const newQuantity = existingItem.quantity + quantity;
-        if (newQuantity > effectiveStock) {
+        if (newQuantity > product.stock) {
           toast({
             title: "Stock insuficiente",
-            description: `Solo hay ${effectiveStock} unidades disponibles`,
+            description: `Solo hay ${product.stock} unidades disponibles`,
             variant: "destructive",
           });
           setIsAdding(false);
@@ -90,38 +53,30 @@ export function AddToCartButton({ product, selectedVariant, disabled, requiresVa
       } else {
         const images = parseImages(product.images);
         cart.push({
-          id: cartItemId,
-          productId: product.id, // ID original del producto
+          id: product.id,
           name: product.name,
           slug: product.slug,
-          price: effectivePrice,
+          price: product.price,
           image: images[0] || "/placeholder.png",
           quantity,
-          stock: effectiveStock,
+          stock: product.stock,
           weight: product.weight,
           width: product.width,
           height: product.height,
           length: product.length,
-          // Información de la variante si existe
-          variantId: selectedVariant?.id || null,
-          variantSize: selectedVariant?.size || null,
         });
       }
 
       localStorage.setItem("cart", JSON.stringify(cart));
 
-      const productName = selectedVariant 
-        ? `${product.name} - Talle ${selectedVariant.size}`
-        : product.name;
-
       toast({
         title: "Agregado al carrito",
-        description: `${quantity}x ${productName}`,
+        description: `${quantity}x ${product.name}`,
       });
-
+      
       // Disparar evento para actualizar el contador del carrito
       window.dispatchEvent(new Event('cartUpdated'));
-
+      
     } catch (error) {
       toast({
         title: "Error",
@@ -132,8 +87,6 @@ export function AddToCartButton({ product, selectedVariant, disabled, requiresVa
       setIsAdding(false);
     }
   };
-
-  const isButtonDisabled = disabled || isAdding || effectiveStock === 0 || (requiresVariant && !selectedVariant);
 
   return (
     <div className="flex flex-col gap-4">
@@ -152,8 +105,8 @@ export function AddToCartButton({ product, selectedVariant, disabled, requiresVa
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setQuantity(Math.min(effectiveStock, quantity + 1))}
-            disabled={quantity >= effectiveStock}
+            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+            disabled={quantity >= product.stock}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -163,12 +116,15 @@ export function AddToCartButton({ product, selectedVariant, disabled, requiresVa
       <Button
         size="lg"
         onClick={handleAddToCart}
-        disabled={isButtonDisabled}
+        disabled={disabled || isAdding}
         className="w-full"
       >
         <ShoppingCart className="mr-2 h-5 w-5" />
-        {isAdding ? "Agregando..." : requiresVariant && !selectedVariant ? "Selecciona un talle" : "Agregar al carrito"}
+        {isAdding ? "Agregando..." : "Agregar al carrito"}
       </Button>
     </div>
   );
 }
+
+
+
