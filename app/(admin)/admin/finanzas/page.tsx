@@ -125,7 +125,7 @@ export default async function FinanzasPage() {
     0
   );
 
-  const productsWithoutCost = await db.product.count({ where: { cost: null } });
+  const _productsWithoutCost = await db.product.count({ where: { cost: null } });
 
   const statusLabels: Record<string, string> = {
     PENDING: "Pendiente",
