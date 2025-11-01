@@ -110,7 +110,8 @@ export async function POST(req: NextRequest) {
           throw new Error(`Stock insuficiente para ${product.name}`);
         }
         return {
-          productId: product.id,`n          variantId: null, // Sin variante
+          productId: product.id,
+          variantId: null,
           name: product.name,
           sku: product.sku || "",
           unitPrice: product.price,
