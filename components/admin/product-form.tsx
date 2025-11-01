@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { ProductVariantsForm, type ProductVariant } from "@/components/admin/product-variants-form";
 
 interface ProductFormData {
   name: string;
@@ -27,6 +29,9 @@ interface ProductFormData {
   width: number | null;
   height: number | null;
   length: number | null;
+  // Variantes (talles)
+  hasVariants: boolean;
+  variants: ProductVariant[];
 }
 
 interface ProductFormProps {
@@ -75,6 +80,9 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
     width: product?.width || null,
     height: product?.height || null,
     length: product?.length || null,
+    // Variantes
+    hasVariants: product?.hasVariants || false,
+    variants: product?.variants || [],
   });
 
   const [imageUrl, setImageUrl] = useState("");
@@ -431,6 +439,46 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         )}
       </div>
 
+
+      {/* Variantes (Talles) */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold">👕 Variantes y Talles</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Agregá talles a tu producto para gestionar stock por cada uno
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Label htmlFor="hasVariants" className="text-sm font-medium">
+              Tiene talles
+            </Label>
+            <Switch
+              id="hasVariants"
+              checked={formData.hasVariants}
+              onCheckedChange={(checked) => {
+                setFormData({ ...formData, hasVariants: checked });
+                if (!checked) {
+                  setFormData(prev => ({ ...prev, variants: [] }));
+                }
+              }}
+            />
+          </div>
+        </div>
+
+        {formData.hasVariants && (
+          <ProductVariantsForm
+            variants={formData.variants}
+            onChange={(variants) => setFormData({ ...formData, variants })}
+          />
+        )}
+
+        {!formData.hasVariants && (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p>Activá "Tiene talles" para gestionar variantes de este producto</p>
+          </div>
+        )}
+      </div>
       {/* Imágenes */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-xl font-semibold mb-4">Imágenes del Producto</h2>
