@@ -19,6 +19,11 @@ export async function GET(
       where: { id },
       include: {
         category: true,
+        variants: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
       },
     });
 
@@ -62,6 +67,8 @@ export async function PUT(
       width,
       height,
       length,
+      hasVariants,
+      variants,
     } = body;
 
     // Verificar que el producto existe
@@ -87,7 +94,14 @@ export async function PUT(
       }
     }
 
-    // Actualizar el producto
+    // Eliminar variantes existentes si hasVariants cambió a false
+    if (hasVariants === false) {
+      await db.productVariant.deleteMany({
+        where: { productId: id },
+      });
+    }
+
+    // Actualizar el producto con variantes
     const product = await db.product.update({
       where: { id },
       data: {
@@ -106,11 +120,54 @@ export async function PUT(
         width: width ? Number(width) : null,
         height: height ? Number(height) : null,
         length: length ? Number(length) : null,
+        hasVariants: hasVariants || false,
       },
       include: {
         category: true,
+        variants: true,
       },
     });
+
+    // Manejar variantes si hasVariants es true
+    if (hasVariants && variants) {
+      // Eliminar variantes que ya no existen
+      const variantSizes = variants.map((v: any) => v.size);
+      await db.productVariant.deleteMany({
+        where: {
+          productId: id,
+          size: { notIn: variantSizes },
+        },
+      });
+
+      // Crear o actualizar variantes
+      for (let index = 0; index < variants.length; index++) {
+        const v = variants[index];
+        await db.productVariant.upsert({
+          where: {
+            productId_size: {
+              productId: id,
+              size: v.size,
+            },
+          },
+          create: {
+            productId: id,
+            size: v.size,
+            sku: v.sku || null,
+            stock: Number(v.stock),
+            price: v.price ? Number(v.price) : null,
+            sortOrder: v.sortOrder ?? index,
+            isActive: v.isActive ?? true,
+          },
+          update: {
+            sku: v.sku || null,
+            stock: Number(v.stock),
+            price: v.price ? Number(v.price) : null,
+            sortOrder: v.sortOrder ?? index,
+            isActive: v.isActive ?? true,
+          },
+        });
+      }
+    }
 
     return NextResponse.json(product);
   } catch (error) {
@@ -158,3 +215,4 @@ export async function DELETE(
     );
   }
 }
+

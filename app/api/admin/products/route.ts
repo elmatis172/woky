@@ -23,6 +23,11 @@ export async function GET(request: NextRequest) {
       },
       include: {
         category: true,
+        variants: {
+          orderBy: {
+            sortOrder: "asc",
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -61,6 +66,8 @@ export async function POST(request: NextRequest) {
       width,
       height,
       length,
+      hasVariants,
+      variants,
     } = body;
 
     // Validaciones básicas
@@ -83,7 +90,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear el producto
+    // Crear el producto con variantes
     const product = await db.product.create({
       data: {
         name,
@@ -101,9 +108,21 @@ export async function POST(request: NextRequest) {
         width: width ? Number(width) : null,
         height: height ? Number(height) : null,
         length: length ? Number(length) : null,
+        hasVariants: hasVariants || false,
+        variants: hasVariants && variants ? {
+          create: variants.map((v: any, index: number) => ({
+            size: v.size,
+            sku: v.sku || null,
+            stock: Number(v.stock),
+            price: v.price ? Number(v.price) : null,
+            sortOrder: v.sortOrder ?? index,
+            isActive: v.isActive ?? true,
+          }))
+        } : undefined,
       },
       include: {
         category: true,
+        variants: true,
       },
     });
 
