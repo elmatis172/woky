@@ -469,6 +469,7 @@ export function ProductForm({ product, categories, isEdit = false }: ProductForm
         {formData.hasVariants && (
           <ProductVariantsForm
             variants={formData.variants}
+            basePrice={formData.price}
             onVariantsChange={(variants) => setFormData({ ...formData, variants })}
           />
         )}
