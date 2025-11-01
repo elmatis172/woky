@@ -92,6 +92,9 @@ export default async function FinanzasPage() {
 
   const ordenesPagadas = orders.filter((order: OrderData) => order.status === 'PAID').length;
   const ordenesPendientes = orders.filter((order: OrderData) => order.status === 'PENDING').length;
+  const ingresoPendiente = orders
+    .filter((order: OrderData) => order.status === 'PENDING')
+    .reduce((sum: number, order: OrderData) => sum + order.totalAmount, 0);
 
 
   // Calcular márgenes de ganancia
