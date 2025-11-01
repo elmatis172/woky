@@ -80,6 +80,9 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
           length: product.length ?? undefined,
         }}
         categories={categories.map((c: any) => ({ id: c.id, name: c.name }))}
+          // Costos y márgenes
+          cost: product.cost ?? undefined,
+          additionalCosts: product.additionalCosts ?? undefined,
         isEdit={true}
       />
     </div>

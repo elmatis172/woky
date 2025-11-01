@@ -93,8 +93,39 @@ export default async function FinanzasPage() {
   const ordenesPagadas = orders.filter((order: OrderData) => order.status === 'PAID').length;
   const ordenesPendientes = orders.filter((order: OrderData) => order.status === 'PENDING').length;
 
-  const ingresoPendiente = orders
-    .filter((order: OrderData) => order.status === 'PENDING')
+
+  // Calcular márgenes de ganancia
+  const productsWithCosts = await db.product.findMany({
+    where: {
+      cost: { not: null },
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      cost: true,
+      additionalCosts: true,
+      stock: true,
+    },
+  });
+
+  const productMargins = productsWithCosts.map((p) => {
+    const totalCost = (p.cost || 0) + (p.additionalCosts || 0);
+    const profit = p.price - totalCost;
+    const margin = p.price > 0 ? (profit / p.price) * 100 : 0;
+    return { ...p, totalCost, profit, margin };
+  });
+
+  const avgMargin = productMargins.length > 0
+    ? productMargins.reduce((sum, p) => sum + p.margin, 0) / productMargins.length
+    : 0;
+
+  const totalPotentialProfit = productMargins.reduce(
+    (sum, p) => sum + (p.profit * (p.stock || 0)),
+    0
+  );
+
+  const productsWithoutCost = await db.product.count({ where: { cost: null } });
     .reduce((sum: number, order: OrderData) => sum + order.totalAmount, 0);
 
   const statusLabels: Record<string, string> = {
@@ -321,8 +352,125 @@ export default async function FinanzasPage() {
               )}
             </tbody>
           </table>
+
+
+      {/* Sección de Márgenes de Ganancia */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold mb-4">📊 Análisis de Rentabilidad</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Margen Promedio */}
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">Margen Promedio</p>
+                <p className="text-3xl font-bold text-green-700 dark:text-green-300 mt-2">
+                  {avgMargin.toFixed(1)}%
+                </p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+              En {productMargins.length} productos con costos
+            </p>
+          </div>
+
+          {/* Ganancia Potencial */}
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Ganancia Potencial</p>
+                <p className="text-3xl font-bold text-blue-700 dark:text-blue-300 mt-2">
+                  {formatPrice(totalPotentialProfit / 100)}
+                </p>
+              </div>
+              <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+            </div>
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              Si se vende todo el stock actual
+            </p>
+          </div>
+
+          {/* Productos con Mejor Margen */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Mejor Margen</p>
+                <p className="text-3xl font-bold text-purple-700 dark:text-purple-300 mt-2">
+                  {productMargins.length > 0 ? Math.max(...productMargins.map(p => p.margin)).toFixed(1) : 0}%
+                </p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+            </div>
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-2">
+              Producto más rentable
+            </p>
+          </div>
+
+          {/* Productos sin Costo */}
+          <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Sin Costos</p>
+                <p className="text-3xl font-bold text-orange-700 dark:text-orange-300 mt-2">
+                  {await db.product.count({ where: { cost: null } })}
+                </p>
+              </div>
+              <ShoppingCart className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+            </div>
+            <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
+              Productos sin costo configurado
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabla de Productos con Márgenes */}
+      {productMargins.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold mb-4">Top 10 Productos por Margen</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-900">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Producto</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Precio</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Costo</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ganancia</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Margen</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {productMargins
+                  .sort((a, b) => b.margin - a.margin)
+                  .slice(0, 10)
+                  .map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                      <td className="px-4 py-3 text-sm">{product.name}</td>
+                      <td className="px-4 py-3 text-sm text-right font-medium">{formatPrice(product.price / 100)}</td>
+                      <td className="px-4 py-3 text-sm text-right text-gray-600 dark:text-gray-400">{formatPrice(product.totalCost / 100)}</td>
+                      <td className="px-4 py-3 text-sm text-right font-semibold text-green-600 dark:text-green-400">{formatPrice(product.profit / 100)}</td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${
+                          product.margin > 50 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                          product.margin > 30 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                          'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                        }`}>
+                          {product.margin.toFixed(1)}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+
         </div>
       </div>
     </div>
   );
 }
+
+
