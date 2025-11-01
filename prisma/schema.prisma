@@ -167,7 +167,9 @@ model ProductVariant {
   isActive       Boolean  @default(true)
   
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt`n`n  orderItems     OrderItem[]
+  updatedAt      DateTime @updatedAt
+
+  orderItems     OrderItem[]
 
   @@unique([productId, size])
   @@index([productId])
@@ -226,7 +228,9 @@ model OrderItem {
   orderId   String
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String?
-  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)`n  variantId String?`n  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
   name      String
   sku       String?
   unitPrice Int      // En centavos
@@ -236,7 +240,11 @@ model OrderItem {
   createdAt DateTime @default(now())
 
   @@index([orderId])
-  @@index([productId])`n  @@index([variantId])`n}`n`nmodel AuditLog {
+  @@index([productId])
+  @@index([variantId])
+}
+
+model AuditLog {
   id        String   @id @default(cuid())
   action    String   // CREATE, UPDATE, DELETE
   entity    String   // Product, Order, User, etc.
