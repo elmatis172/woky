@@ -4,12 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const createOrderSchema = z.object({
-  items: z.array(
-    z.object({
-      productId: z.string(),
-      quantity: z.number().int().positive(),
-    })
-  ),
+  items: z.array(`n    z.object({`n      productId: z.string(),`n      variantId: z.string().nullable().optional(), // ID de variante si existe`n      quantity: z.number().int().positive(),`n    })`n  ),
   email: z.string().email(),
   customerData: z
     .object({
@@ -66,24 +61,57 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar stock suficiente
+        // Obtener variantes si existen
+    const variantIds = items.filter(item => item.variantId).map(item => item.variantId as string);
+    const variants = variantIds.length > 0 
+      ? await db.productVariant.findMany({
+          where: { id: { in: variantIds } },
+          include: { product: true }
+        })
+      : [];
+
+    console.log("MP API - Found variants:", variants.length);
+
+    // Verificar stock suficiente y preparar items
     const orderItems = items.map((item) => {
       const product = products.find((p: any) => p.id === item.productId);
       if (!product) {
         throw new Error("Producto no encontrado");
       }
-      if (product.stock < item.quantity) {
-        throw new Error(`Stock insuficiente para ${product.name}`);
+
+      // Si hay variante, usar su stock y precio
+      if (item.variantId) {
+        const variant = variants.find((v: any) => v.id === item.variantId);
+        if (!variant) {
+          throw new Error(`Variante no encontrada para ${product.name}`);
+        }
+        if (variant.stock < item.quantity) {
+          throw new Error(`Stock insuficiente para ${product.name} - Talle ${variant.size}`);
+        }
+        return {`n          productId: product.id,`n          variantId: variant.id, // ID de la variante`n          name: `${product.name} - Talle ${variant.size}`,
+          sku: variant.sku || product.sku || "",
+          unitPrice: variant.price ?? product.price,
+          quantity: item.quantity,
+          image: product.images[0] || null,
+          size: variant.size,
+        };
+      } else {
+        // Sin variante, usar stock y precio del producto
+        if (product.stock < item.quantity) {
+          throw new Error(`Stock insuficiente para ${product.name}`);
+        }
+        return {
+          productId: product.id,`n          variantId: null, // Sin variante
+          name: product.name,
+          sku: product.sku || "",
+          unitPrice: product.price,
+          quantity: item.quantity,
+          image: product.images[0] || null,
+          size: null,
+        };
       }
-      return {
-        productId: product.id,
-        name: product.name,
-        sku: product.sku || "",
-        unitPrice: product.price,
-        quantity: item.quantity,
-        image: product.images[0] || null,
-      };
     });
+
 
     console.log("MP API - Order items prepared:", orderItems.length);
 
@@ -210,3 +238,8 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
+
+
+

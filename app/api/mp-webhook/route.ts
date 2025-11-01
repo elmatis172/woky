@@ -140,28 +140,40 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Si el pago fue aprobado, decrementar stock
-    if (newStatus === "PAID") {
-      const items = await db.orderItem.findMany({
-        where: { orderId: order.id },
-      });
+          // Si el pago fue aprobado, decrementar stock
+      if (newStatus === "PAID") {
+        const items = await db.orderItem.findMany({
+          where: { orderId: order.id },
+        });
 
-      for (const item of items) {
-        if (item.productId) {
-          await db.product.update({
-            where: { id: item.productId },
-            data: {
-              stock: {
-                decrement: item.quantity,
+        for (const item of items) {
+          if (item.variantId) {
+            // Descontar stock de la variante
+            await db.productVariant.update({
+              where: { id: item.variantId },
+              data: {
+                stock: {
+                  decrement: item.quantity,
+                },
               },
-            },
-          });
+            });
+          } else if (item.productId) {
+            // Descontar stock del producto (sin variante)
+            await db.product.update({
+              where: { id: item.productId },
+              data: {
+                stock: {
+                  decrement: item.quantity,
+                },
+              },
+            });
+          }
         }
+
+        // Aquí podrías enviar email de confirmación, notificar a Slack, etc.
+        console.log("✅ Payment approved for order:", orderId);
       }
 
-      // Aquí podrías enviar email de confirmación, notificar a Slack, etc.
-      console.log("✅ Payment approved for order:", orderId);
-    }
 
     return NextResponse.json({
       received: true,
@@ -181,3 +193,4 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({ status: "ok" });
 }
+
