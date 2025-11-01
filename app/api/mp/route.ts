@@ -94,7 +94,10 @@ export async function POST(req: NextRequest) {
         if (variant.stock < item.quantity) {
           throw new Error(`Stock insuficiente para ${product.name} - Talle ${variant.size}`);
         }
-        return {`n          productId: product.id,`n          variantId: variant.id, // ID de la variante`n          name: `${product.name} - Talle ${variant.size}`,
+        return {
+          productId: product.id,
+          variantId: variant.id,
+          name: `${product.name} - Talle ${variant.size}`,
           sku: variant.sku || product.sku || "",
           unitPrice: variant.price ?? product.price,
           quantity: item.quantity,

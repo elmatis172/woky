@@ -108,7 +108,11 @@ export default function CarritoPage() {
         body: JSON.stringify({
           zipCode: shippingData.postalCode,
           province: shippingData.province,
-          items: cart.map((item) => ({`n            productId: item.productId || item.id, // Usar productId si existe, sino id`n            variantId: item.variantId || null, // ID de variante si existe`n            quantity: item.quantity,`n          })),
+          items: cart.map((item) => ({
+            productId: item.productId || item.id,
+            variantId: item.variantId || null,
+            quantity: item.quantity,
+          })),
         }),
       });
 
@@ -174,7 +178,11 @@ export default function CarritoPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: cart.map((item) => ({`n            productId: item.productId || item.id, // Usar productId si existe, sino id`n            variantId: item.variantId || null, // ID de variante si existe`n            quantity: item.quantity,`n          })),
+          items: cart.map((item) => ({
+            productId: item.productId || item.id,
+            variantId: item.variantId || null,
+            quantity: item.quantity,
+          })),
           email: shippingData.email,
           shippingMethodId: selectedShipping.id,
           shippingCost: selectedShipping.cost,
@@ -273,7 +281,12 @@ export default function CarritoPage() {
                         className="font-semibold hover:text-primary"
                       >
                         {item.name}
-                      </Link>`n                        {item.variantSize && (`n                          <span className="text-sm text-muted-foreground block mt-1">`n                            Talle: <span className="font-semibold text-foreground">{item.variantSize}</span>`n                          </span>`n                        )}
+                      </Link>
+                        {item.variantSize && (
+                          <span className="text-sm text-muted-foreground block mt-1">
+                            Talle: <span className="font-semibold text-foreground">{item.variantSize}</span>
+                          </span>
+                        )}
                       <p className="text-sm text-muted-foreground">
                         {formatPrice(item.price)} c/u
                       </p>

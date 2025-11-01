@@ -49,7 +49,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
           isActive: true,
         },
         orderBy: {
-          sortOrder: 'asc',`n        },`n      },`n    },
+          sortOrder: 'asc',
+        },
+      },
+    },
   });
 
   if (!product) {
