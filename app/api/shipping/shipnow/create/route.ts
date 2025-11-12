@@ -146,19 +146,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Obtener customerData actual y agregar info de ShipNow
+    const currentCustomerData = order.customerData ? JSON.parse(order.customerData) : {};
+    const updatedCustomerData = {
+      ...currentCustomerData,
+      shipNowData: {
+        provider: "ShipNow",
+        shipmentId: shipmentResponse.shipment?.id,
+        trackingNumber: shipmentResponse.shipment?.trackingNumber,
+        carrier: shipmentResponse.shipment?.carrier,
+        labelUrl: shipmentResponse.shipment?.labelUrl,
+        status: shipmentResponse.shipment?.status,
+        createdAt: new Date().toISOString(),
+      },
+    };
+
     // Actualizar orden con datos del envío
     const updatedOrder = await db.order.update({
       where: { id: orderId },
       data: {
-        shippingData: JSON.stringify({
-          provider: "ShipNow",
-          shipmentId: shipmentResponse.shipment?.id,
-          trackingNumber: shipmentResponse.shipment?.trackingNumber,
-          carrier: shipmentResponse.shipment?.carrier,
-          labelUrl: shipmentResponse.shipment?.labelUrl,
-          status: shipmentResponse.shipment?.status,
-          createdAt: new Date().toISOString(),
-        }),
+        customerData: JSON.stringify(updatedCustomerData),
       },
     });
 
