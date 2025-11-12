@@ -75,7 +75,8 @@ export async function POST(request: NextRequest) {
       return sum + weight * item.quantity;
     }, 0);
 
-    // Usar dimensiones del item más grande
+    // Usar dimensiones del item más grande (con valores por defecto)
+    const firstProduct = order.items[0]?.product;
     const largestItem = order.items.reduce((largest, item) => {
       const product = item.product;
       if (!product) return largest;
@@ -83,10 +84,10 @@ export async function POST(request: NextRequest) {
       const itemVolume = 
         (product.width || 0) * (product.height || 0) * (product.length || 0);
       const largestVolume = 
-        (largest.width || 0) * (largest.height || 0) * (largest.length || 0);
+        (largest?.width || 0) * (largest?.height || 0) * (largest?.length || 0);
       
       return itemVolume > largestVolume ? product : largest;
-    }, order.items[0]?.product);
+    }, firstProduct) || { width: 20, height: 10, length: 30 }; // Valores por defecto
 
     // Crear el envío con ShipNow
     const shipmentRequest = {
