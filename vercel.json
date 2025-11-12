@@ -1,7 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm ci --legacy-peer-deps",
-  "framework": "nextjs",
-  "regions": ["iad1"]
+  "buildCommand": "prisma generate && next build",
+  "framework": "nextjs"
 }
