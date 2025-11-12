@@ -141,7 +141,7 @@ export async function POST(request: Request) {
             ? `Entrega en ${quote.estimatedDeliveryDays} días`
             : quote.minimum_delivery && quote.maximum_delivery
             ? `Entre ${new Date(quote.minimum_delivery).toLocaleDateString()} y ${new Date(quote.maximum_delivery).toLocaleDateString()}`
-            : undefined,
+            : null,
           isMercadoEnvios: false,
           isShipNow: true,
           shipNowServiceId: quote.serviceId,
