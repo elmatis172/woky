@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAvailableShippingOptions } from "@/lib/mercado-envios";
 import { calculateOCAShipping } from "@/lib/oca";
+import { getShipNowQuote } from "@/lib/shipnow";
 
 // Tipo base para opciones de envío
 type ShippingOption = {
@@ -113,11 +114,56 @@ export async function POST(request: Request) {
       console.error("⚠️ Error calculando envíos OCA:", ocaError);
     }
 
+    // Agregar opciones de ShipNow
+    let shipNowOptions: ShippingOption[] = [];
+    try {
+      // Calcular peso total del paquete
+      const totalWeight = itemsWithDimensions.reduce(
+        (sum: number, item: any) => sum + (item.weight || 0) * item.quantity,
+        0
+      );
+
+      const shipNowResponse = await getShipNowQuote({
+        to_zip_code: zipCode,
+        weight: totalWeight || 500, // peso en gramos, mínimo 500g
+        types: "ship_pap,ship_pas", // domicilio y sucursal
+        categories: "economic", // estándar (agregar "super_express" si lo necesitas)
+        mode: "delivery", // entregas (usar "exchange" para devoluciones)
+      });
+
+      if (shipNowResponse.success && shipNowResponse.quotes.length > 0) {
+        shipNowOptions = shipNowResponse.quotes.map((quote) => ({
+          id: quote.serviceId,
+          name: `${quote.carrier} - ${quote.serviceName}`,
+          type: "SHIPNOW",
+          cost: quote.tax_price, // Usar precio con IVA
+          estimatedDays: quote.estimatedDeliveryDays 
+            ? `Entrega en ${quote.estimatedDeliveryDays} días`
+            : quote.minimum_delivery && quote.maximum_delivery
+            ? `Entre ${new Date(quote.minimum_delivery).toLocaleDateString()} y ${new Date(quote.maximum_delivery).toLocaleDateString()}`
+            : undefined,
+          isMercadoEnvios: false,
+          isShipNow: true,
+          shipNowServiceId: quote.serviceId,
+          carrier: quote.carrier,
+          provinces: null,
+          minAmount: null,
+          maxAmount: null,
+        }));
+
+        console.log(`🚀 Opciones ShipNow: ${shipNowOptions.length}`);
+        options.all = [...options.all, ...shipNowOptions] as ShippingOption[];
+      }
+    } catch (shipNowError) {
+      console.error("⚠️ Error calculando envíos ShipNow:", shipNowError);
+    }
+
     return NextResponse.json({
       success: true,
       local: options.local,
       mercadoEnvios: options.mercadoEnvios,
       oca: ocaOptions,
+      shipNow: shipNowOptions,
       all: options.all,
     });
   } catch (error) {
