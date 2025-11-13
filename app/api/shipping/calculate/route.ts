@@ -108,8 +108,9 @@ export async function POST(request: Request) {
 
       console.log(`🚚 Opciones OCA: ${ocaOptions.length}`);
 
-      // Agregar opciones de OCA al total
-      options.all = [...options.all, ...ocaOptions] as ShippingOption[];
+      // Agregar opciones de OCA al total solo si no usamos ShipNow
+      // ShipNow ya incluye OCA en sus opciones
+      // options.all = [...options.all, ...ocaOptions] as ShippingOption[];
     } catch (ocaError) {
       console.error("⚠️ Error calculando envíos OCA:", ocaError);
     }
