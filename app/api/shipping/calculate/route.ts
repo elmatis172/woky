@@ -152,7 +152,20 @@ export async function POST(request: Request) {
           maxAmount: null,
         }));
 
-        console.log(`🚀 Opciones ShipNow: ${shipNowOptions.length}`);
+        // Eliminar duplicados por nombre + costo
+        const uniqueOptions = shipNowOptions.reduce((acc: ShippingOption[], option) => {
+          const exists = acc.find(
+            (o) => o.name === option.name && o.cost === option.cost
+          );
+          if (!exists) {
+            acc.push(option);
+          }
+          return acc;
+        }, []);
+
+        shipNowOptions = uniqueOptions;
+
+        console.log(`🚀 Opciones ShipNow (únicas): ${shipNowOptions.length}`);
         options.all = [...options.all, ...shipNowOptions] as ShippingOption[];
       }
     } catch (shipNowError) {
